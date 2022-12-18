@@ -1,51 +1,64 @@
-
-import neo4j from "neo4j-driver";
 import express from "express";
-import logger from "morgan";
-import bodyParser from "body-parser";
-import path from "path";
+import neo4j from "neo4j-driver";
+import dotenv from "dotenv";
+import cors from "cors";
+import { graphqlHTTP } from "express-graphql";
+import { schema } from "./graphql-schema";
+import { TCreateUser } from "./definitions";
+
+dotenv.config();
+
+console.log(process.env.NEO4J_URI);
+console.log(process.env.NEO4J_USER);
+console.log(process.env.NEO4J_PASSWORD);
+
+const driver = neo4j.driver(
+  process.env.NEO4J_URI || "bolt://localhost:7687",
+  neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "neo4j")
+);
+const session = driver.session();
+
+const root = {
+  getAllUsers: async () => {
+    const respRead = await session.run("MATCH (n:User) RETURN n, labels(n) as l LIMIT 10");
+    const res = respRead.records.map((record) => record["_fields"][0].properties);
+    // @ts-ignore
+    return res;
+  },
+  getUser: async ({ id }: { id: string }) => {
+    const respRead = await session.run("MATCH(u : User {id: $id }) RETURN u", { id });
+    const res = respRead.records.map((record) => record["_fields"][0].properties);
+    console.log(res);
+    // @ts-ignore
+    return res[0];
+  },
+  createUser: async ({ input }: { input: TCreateUser }) => {
+    const id = Date.now().toString();
+    const user = {
+      id,
+      username: input.username,
+      password: input.password,
+    };
+    await session.run("CREATE (a:User {id: $id, username: $username, password: $password  }) RETURN a", { ...user });
+    return user;
+  },
+};
 
 const app = express();
 
-app.set('view engine', 'ejs');
-app.use(logger('dev'))
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(express.static(path.join(__dirname, "public")));
-
-
-const driver = neo4j.driver("bolt://localhost", neo4j.auth.basic('neo4j', '12345678'));
-const session = driver.session()
-
-const port = 5000;
-
-const name = 'Some Person';
-
-app.get('/', async (request, response) => {
-    let respWrite, respRead;
-    try {
-        respWrite = await session.run(
-            'CREATE (a:Person {name: $name}) RETURN a',
-            {name: new Date().toISOString()}
-        );
-
-        respRead = await session.run(
-            'MATCH (n:Person) RETURN n, labels(n) as l LIMIT 10'
-        )
-
-
-    } catch (error) {
-        console.log(error);
-    }
-
-    if (respRead) {
-        // @ts-ignore
-        const str = JSON.stringify(respRead.records.map((record) => record["_fields"][0].properties));
-        console.log(str, respRead.records[0]["_fields"]);
-        response.send(str);
-    } else {
-        response.send('Nothing found in db');
-    }
-
+app.listen(5001, async () => {
+  const servInfo = await driver.getServerInfo();
+  console.log(servInfo);
+  console.log("server started at port 5001");
 });
-app.listen(port, () => console.log(`Running on port ${port}`));
+
+app.use(cors());
+
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    graphiql: true,
+    schema,
+    rootValue: root,
+  })
+);
