@@ -5,8 +5,9 @@ import ErrorPage from "./error-page";
 import { AuthPage } from "./pages/authPage";
 import { StatisticPage } from "./pages/statisticPage";
 import { Layout } from "./components/Layout";
-import { UserPage } from "./pages/userPage";
+import { ProfilePage } from "./pages/profilePage";
 import { TUser } from "./definitions";
+import { RidesPage } from "./pages/ridesPage";
 
 export const UserContext = React.createContext({
   currentUser: {
@@ -35,10 +36,11 @@ function Root() {
       <UserContext.Provider value={{ currentUser, setCurrentUser }}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="auth" element={<AuthPage />}></Route>
             <Route path="*" element={<ErrorPage />}></Route>
+            <Route path="auth" element={<AuthPage />}></Route>
             <Route path="statistics" element={<StatisticPage />}></Route>
-            <Route path="profile" element={<UserPage />}></Route>
+            <Route path="profile" element={<ProfilePage />}></Route>
+            <Route path="rides" element={<RidesPage />}></Route>
           </Route>
         </Routes>
       </UserContext.Provider>

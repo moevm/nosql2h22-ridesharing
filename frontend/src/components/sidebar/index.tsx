@@ -109,7 +109,7 @@ export function AsideHeaderShowcase() {
         compact={compact}
         renderContent={() => {
           return (
-            <div>
+            <div className={"outlet-page"}>
               <Outlet />
             </div>
           );

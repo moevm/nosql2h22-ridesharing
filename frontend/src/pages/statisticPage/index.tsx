@@ -1,14 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
-import { GET_ALL_USERS } from "../../graphql/queries/user";
-import { Button, Table } from "@gravity-ui/uikit";
+import React, { useContext, useEffect } from "react";
 import { UserContext } from "../../root";
 import { useNavigate } from "react-router-dom";
+import { AllEntitiesTable } from "./components/allEntitiesTable";
+import { GET_ALL_RIDES, GET_ALL_USERS } from "../../graphql/queries/user";
 
 export const StatisticPage = () => {
-  const { data, loading, error, refetch } = useQuery(GET_ALL_USERS);
-  const [users, setUsers] = useState([]);
-
   const { currentUser } = useContext(UserContext);
 
   const navigate = useNavigate();
@@ -19,15 +15,11 @@ export const StatisticPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      setUsers(data.getAllUsers);
-    }
-  }, [data]);
-
   return (
-    <>
-      <Table
+    <div>
+      <AllEntitiesTable
+        graphQlMethod={GET_ALL_USERS}
+        extractMethod={"getAllUsers"}
         columns={[
           {
             id: "username",
@@ -38,17 +30,38 @@ export const StatisticPage = () => {
             name: "Id",
           },
         ]}
-        data={users}
-      />
-
-      <Button
-        onClick={function onClick() {
-          refetch();
-        }}
-        view="normal"
-      >
-        Load users
-      </Button>
-    </>
+      ></AllEntitiesTable>
+      <AllEntitiesTable
+        graphQlMethod={GET_ALL_RIDES}
+        extractMethod={"getAllRides"}
+        columns={[
+          {
+            id: "title",
+            name: "Title",
+          },
+          {
+            id: "from",
+            name: "From",
+          },
+          {
+            id: "to",
+            name: "to",
+          },
+          {
+            id: "price",
+            name: "price",
+          },
+          {
+            id: "maxPassengers",
+            name: "maxPassengers",
+          },
+          {
+            id: "statusHistory",
+            name: "statusHistory",
+            template: (item) => item.statusHistory.join(";"),
+          },
+        ]}
+      ></AllEntitiesTable>
+    </div>
   );
 };
