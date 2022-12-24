@@ -3,8 +3,13 @@ import { gql } from "@apollo/client";
 export const CREATE_USER = gql`
   mutation createUser($input: UserInput) {
     createUser(input: $input) {
-      username
-      password
+      user {
+        username
+        id
+      }
+      error {
+        errorMessage
+      }
     }
   }
 `;
@@ -15,6 +20,7 @@ export const LOGIN_USER = gql`
       username
       id
       isAuthorized
+      isAdmin
     }
   }
 `;

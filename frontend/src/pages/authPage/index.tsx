@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
-import { AddUserDialog } from "../../components/addUserDialog";
-import { Button, Card, Text, TextInput } from "@gravity-ui/uikit";
+import { AddUserDialog } from "../../components/addUserDialog/addUserDialog";
+import { Button, Card, Text, TextInput, useToaster } from "@gravity-ui/uikit";
 
 import "./style.scss";
 import { useMutation } from "@apollo/client";
@@ -9,6 +9,8 @@ import { UserContext } from "../../root";
 import { useNavigate } from "react-router-dom";
 
 export const AuthPage = () => {
+  const { add } = useToaster();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,14 +32,35 @@ export const AuthPage = () => {
           password,
         },
       },
-    }).then(({ data }) => {
-      if (data.loginUser.isAuthorized) {
-        setCurrentUser(data.loginUser);
-        navigate("/profile");
-      }
+    })
+      .then(({ data }) => {
+        if (data.loginUser.isAuthorized) {
+          setCurrentUser(data.loginUser);
+          navigate("/profile");
+        } else {
+          add({
+            name: "Error",
+            title: "Failed to authorize",
+            type: "error",
+            allowAutoHiding: true,
+            timeout: 5000,
+          });
+        }
 
-      setIsLoading(false);
-    });
+        setIsLoading(false);
+      })
+      .catch((errors) => {
+        console.log(errors);
+        add({
+          name: "Error",
+          title: "Failed to authorize",
+          content: errors?.message,
+          type: "error",
+          allowAutoHiding: true,
+          timeout: 5000,
+        });
+        setIsLoading(false);
+      });
   };
 
   const onLogin = () => {
@@ -48,7 +71,7 @@ export const AuthPage = () => {
   return (
     <div className={"auth-page"}>
       <Card view={"raised"} className="card-login">
-        <Text>Ridesharing authorization</Text>
+        <Text variant="header-2"> Ridesharing authorization</Text>
         <TextInput
           disabled={isLoading}
           className={"text-input"}
@@ -63,12 +86,19 @@ export const AuthPage = () => {
           value={password}
           placeholder="password"
         />
-        <Button view="action" size="m" onClick={onLogin} loading={isLoading}>
+        <Button
+          view="action"
+          size="m"
+          onClick={onLogin}
+          loading={isLoading}
+          className={"login-button"}
+        >
           Login
         </Button>
         <br />
-        Or create new entry
-        <AddUserDialog></AddUserDialog>
+        <div className={"new-entry-block"}>
+          <AddUserDialog></AddUserDialog>
+        </div>
       </Card>
     </div>
   );

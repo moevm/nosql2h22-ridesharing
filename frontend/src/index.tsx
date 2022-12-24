@@ -5,7 +5,11 @@ import "@gravity-ui/uikit/styles/styles.scss";
 
 import { BrowserRouter } from "react-router-dom";
 import Root from "./root";
-import { ThemeProvider } from "@gravity-ui/uikit";
+import {
+  ThemeProvider,
+  ToasterComponent,
+  ToasterProvider,
+} from "@gravity-ui/uikit";
 
 const cache = new InMemoryCache();
 
@@ -22,7 +26,10 @@ root.render(
   <ApolloProvider client={client}>
     <BrowserRouter>
       <ThemeProvider theme="light">
-        <Root />
+        <ToasterProvider>
+          <Root />
+          <ToasterComponent />
+        </ToasterProvider>
       </ThemeProvider>
     </BrowserRouter>
   </ApolloProvider>

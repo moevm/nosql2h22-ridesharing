@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, { useContext, useEffect } from "react";
 import { UserCard } from "../../components/userCard";
 
 import { useNavigate } from "react-router-dom";

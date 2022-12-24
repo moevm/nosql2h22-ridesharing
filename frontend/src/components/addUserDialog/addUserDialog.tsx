@@ -1,9 +1,11 @@
-import { Button, Dialog, TextInput } from "@gravity-ui/uikit";
+import { Button, Dialog, TextInput, useToaster } from "@gravity-ui/uikit";
 import React, { useState } from "react";
-import { CREATE_USER } from "../graphql/mutations/user";
 import { useMutation } from "@apollo/client";
+import { CREATE_USER } from "../../graphql/mutations/user";
 
 export const AddUserDialog: React.FC = () => {
+  const { add } = useToaster();
+
   const [open, setOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,16 +22,36 @@ export const AddUserDialog: React.FC = () => {
       },
     }).then(({ data }) => {
       console.log(data);
-      setUsername("");
-      setPassword("");
-      setOpen(false);
+      if (data.createUser.error) {
+        add({
+          name: "Error",
+          title: "Failed to create user",
+          content: data.createUser.error.errorMessage,
+          type: "error",
+          allowAutoHiding: true,
+          timeout: 5000,
+        });
+      } else {
+        setUsername("");
+        setPassword("");
+        setOpen(false);
+        add({
+          name: "user created",
+          title: "User created",
+          type: "success",
+          allowAutoHiding: true,
+          timeout: 5000,
+        });
+      }
     });
   };
 
   return (
     <div className="add-user-dialog">
       <Button
-        view="outlined-contrast"
+        className={"add-user-dialog-button"}
+        width={"max"}
+        view="normal"
         size="m"
         onClick={function onClick() {
           return setOpen(!0);
@@ -53,11 +75,13 @@ export const AddUserDialog: React.FC = () => {
         />
         <Dialog.Body>
           <TextInput
+            className={"text-input"}
             onUpdate={setUsername}
             value={username}
             placeholder="username"
           />
           <TextInput
+            className={"text-input"}
             onUpdate={setPassword}
             value={password}
             placeholder="password"

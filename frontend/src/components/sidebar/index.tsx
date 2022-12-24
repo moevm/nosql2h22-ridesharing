@@ -1,11 +1,12 @@
 import { AsideHeader } from "@gravity-ui/navigation";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import "./style.scss";
 import { UserContext } from "../../root";
 import { useMutation } from "@apollo/client";
 import { LOGOUT_USER } from "../../graphql/mutations/user";
+import { MenuItem } from "@gravity-ui/navigation/build/esm/components/types";
 
 export function AsideHeaderShowcase() {
   const { currentUser, setCurrentUser } = useContext(UserContext);
@@ -14,18 +15,9 @@ export function AsideHeaderShowcase() {
   const [logoutUser] = useMutation(LOGOUT_USER);
 
   const [compact, setCompact] = useState(false);
+  const [items, setItems] = useState<MenuItem[]>([]);
 
-  const navRef = useRef<AsideHeader>(null);
-
-  const items = [
-    {
-      id: "statistics",
-      title: "Statistics",
-      iconSize: 20,
-      onItemClick: () => {
-        navigate("/statistics");
-      },
-    },
+  const defaultItems = [
     {
       id: "profile",
       title: "Profile",
@@ -50,7 +42,30 @@ export function AsideHeaderShowcase() {
         navigate("/companions");
       },
     },
+  ];
+
+  const adminItems = [
     {
+      id: "statistics",
+      title: "Statistics",
+      iconSize: 20,
+      onItemClick: () => {
+        navigate("/statistics");
+      },
+    },
+  ];
+
+  const navRef = useRef<AsideHeader>(null);
+
+  useEffect(() => {
+    let _items: MenuItem[] = [];
+    if (currentUser.isAuthorized) {
+      _items = defaultItems;
+    }
+    if (currentUser.isAdmin) {
+      _items.unshift(...adminItems);
+    }
+    _items.push({
       id: "auth",
       title: currentUser.isAuthorized ? "Logout" : "Login",
       iconSize: 20,
@@ -64,17 +79,22 @@ export function AsideHeaderShowcase() {
             },
           }).then(({ data }) => {
             if (data.logoutUser) {
-              setCurrentUser({ username: "", id: "", isAuthorized: false });
+              setCurrentUser({
+                username: "",
+                id: "",
+                isAuthorized: false,
+                isAdmin: false,
+              });
               navigate("/auth");
             }
           });
-          // todo run mutation logout
         } else {
           navigate("/auth");
         }
       },
-    },
-  ];
+    });
+    setItems(_items);
+  }, [currentUser]);
 
   return (
     <div>
@@ -85,7 +105,7 @@ export function AsideHeaderShowcase() {
           href: "#",
           onClick: () => {},
         }}
-        menuItems={currentUser.isAuthorized ? items : [items[items.length - 1]]}
+        menuItems={items}
         compact={compact}
         renderContent={() => {
           return (

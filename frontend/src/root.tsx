@@ -11,6 +11,7 @@ import { TUser } from "./definitions";
 export const UserContext = React.createContext({
   currentUser: {
     isAuthorized: false,
+    isAdmin: false,
     username: "",
     id: "",
   },
@@ -21,6 +22,7 @@ function Root() {
   const [currentUser, setUser] = useState({
     isAuthorized: false,
     username: "",
+    isAdmin: false,
     id: "",
   });
 
