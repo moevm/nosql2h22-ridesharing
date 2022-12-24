@@ -27,12 +27,13 @@ export const AddUserDialog: React.FC = () => {
   };
 
   return (
-    <div className="category-container">
+    <div className="add-user-dialog">
       <Button
+        view="outlined-contrast"
+        size="m"
         onClick={function onClick() {
           return setOpen(!0);
         }}
-        view="normal"
       >
         Create new account
       </Button>

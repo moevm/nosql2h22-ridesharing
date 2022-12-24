@@ -5,6 +5,7 @@ import cors from "cors";
 import { graphqlHTTP } from "express-graphql";
 import { schema } from "./graphql-schema";
 import { TCreateUser, TLoginUser, TLogoutUser } from "./definitions";
+import { DbUserController } from "./db/dbUserController";
 
 dotenv.config();
 
@@ -12,82 +13,46 @@ console.log(process.env.NEO4J_URI);
 console.log(process.env.NEO4J_USER);
 console.log(process.env.NEO4J_PASSWORD);
 
-const driver = neo4j.driver(
+export const driver = neo4j.driver(
   process.env.NEO4J_URI || "bolt://localhost:7687",
   neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "neo4j")
 );
-const session = driver.session();
+export const session = driver.session();
+
+const dbUserController = new DbUserController();
 
 const root = {
   getAllUsers: async () => {
-    const respRead = await session.run("MATCH (n:User) RETURN n, labels(n) as l LIMIT 10");
-    const res = respRead.records.map((record) => record["_fields"][0].properties);
-    // @ts-ignore
-    return res;
+    return await dbUserController.getAllUsers();
   },
-  getUser: async ({ id }: { id: string }) => {
-    const respRead = await session.run("MATCH(u : User {id: $id }) RETURN u", { id });
-    const res = respRead.records.map((record) => record["_fields"][0].properties);
+  getUser: async ({ username }: { username: string }) => {
+    const res = await dbUserController.getUserByUsername(username);
     console.log(res);
     // @ts-ignore
     return res[0];
   },
   logoutUser: async ({ input }: { input: TLogoutUser }) => {
-    try {
-      console.log(input);
-      const respRead = await session.run(
-        "MATCH(u : User {username: $username}) SET u.isAuthorized = $authorized RETURN u",
-        {
-          username: input.username.toString(),
-          authorized: false,
-        }
-      );
-      console.log(respRead);
-      if (respRead) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    return await dbUserController.logoutUser(input);
   },
   loginUser: async ({ input }: { input: TLoginUser }) => {
-    try {
-      const respRead = await session.run(
-        "MATCH(u : User {username: $username, password: $password }) SET u.isAuthorized = $authorized RETURN u",
-        {
-          username: input.username.toString(),
-          password: input.password.toString(),
-          authorized: true,
-        }
-      );
-      const res = respRead.records.map((record) => record["_fields"][0].properties);
-      if (!res[0]) {
-        return {
-          id: "",
-          username: "",
-          isAuthorized: false,
-        };
-      }
-      return res[0];
-    } catch (e) {
-      console.error(e);
-    }
+    return await dbUserController.loginUser(input);
   },
   createUser: async ({ input }: { input: TCreateUser }) => {
-    const id = Date.now().toString();
-    const user = {
-      id,
-      username: input.username,
-      password: input.password,
-      isAuthorized: false,
-    };
-    await session.run(
-      "CREATE (a:User {id: $id, username: $username, password: $password, isAuthorized: $isAuthorized }) RETURN a",
-      { ...user }
-    );
-    return user;
+    const readUser = await dbUserController.getUserByUsername(input.username);
+
+    if (readUser.user) {
+      return {
+        error: {
+          errorMessage: "User with such username already registered",
+        },
+      };
+    } else if (readUser.error) {
+      return {
+        error: readUser.error,
+      };
+    }
+
+    return await dbUserController.createUser(input);
   },
 };
 
