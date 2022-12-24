@@ -1,10 +1,13 @@
-import { TCreateUser, TLoginUser, TLogoutUser, TUser, TUserReadResponse } from "../definitions";
-import { session } from "../index";
+import { MAX_PAGE_SIZE, TCreateUser, TLoginUser, TLogoutUser, TUser, TUserReadResponse } from "../definitions";
+import { driver, } from "../index";
+import neo4j from "neo4j-driver";
 
 export class DbUserController {
+  private session = driver.session();
+
   public async getUserByUsername(username: string): Promise<TUserReadResponse> {
     try {
-      const respRead = await session.run("MATCH(u : USER {username: $username }) RETURN u", { username });
+      const respRead = await this.session.run("MATCH(u : USER {username: $username }) RETURN u", { username });
       const res = respRead.records.map((record) => record["_fields"][0].properties);
       return { user: res[0] };
     } catch (error) {
@@ -16,9 +19,14 @@ export class DbUserController {
     }
   }
 
-  public async getAllUsers(): Promise<TUser[]> {
+  public async getAllUsers(pagenumber: number): Promise<TUser[]> {
     try {
-      const respRead = await session.run("MATCH (n:USER) RETURN n, labels(n) as l LIMIT 10");
+      const respRead = await this.session.readTransaction((tcx) =>
+        tcx.run("MATCH (u:USER) RETURN u ORDER by u.id SKIP $pagination LIMIT $pageSize", {
+          pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
+          pageSize: neo4j.int(MAX_PAGE_SIZE),
+        })
+      );
       const res = respRead.records.map((record) => record["_fields"][0].properties);
       return res as TUser[];
     } catch (error) {
@@ -29,7 +37,7 @@ export class DbUserController {
 
   public async loginUser(input: TLoginUser): Promise<Partial<TUser>> {
     try {
-      const respRead = await session.run(
+      const respRead = await this.session.run(
         "MATCH(u : USER {username: $username, password: $password }) SET u.isAuthorized = $authorized RETURN u",
         {
           username: input.username.toString(),
@@ -55,7 +63,7 @@ export class DbUserController {
 
   public async logoutUser(input: TLogoutUser): Promise<boolean> {
     try {
-      const respRead = await session.run(
+      const respRead = await this.session.run(
         "MATCH(u : USER {username: $username}) SET u.isAuthorized = $authorized RETURN u",
         {
           username: input.username.toString(),
@@ -78,8 +86,9 @@ export class DbUserController {
         isAuthorized: false,
         isAdmin: false,
       };
-      await session.run(
-        "CREATE (a:USER {id: $id, username: $username, password: $password, isAuthorized: $isAuthorized, isAdmin: $isAdmin }) RETURN a",
+      await this.session.run(
+        "CREATE (a:USER {id: $id, username: $username, password: $password, isAuthorized: $isAuthorized, " +
+          "isAdmin: $isAdmin }) RETURN a",
         { ...user }
       );
 
@@ -90,6 +99,14 @@ export class DbUserController {
           errorMessage: JSON.stringify(error),
         },
       };
+    }
+  }
+
+  public async getUserRides(username: string): Promise<boolean> {
+    try {
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

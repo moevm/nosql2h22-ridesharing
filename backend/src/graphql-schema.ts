@@ -9,10 +9,22 @@ export const schema = buildSchema(`
     isAdmin: Boolean
     rides: [Ride]
   }
+  
+  type Relation {
+    isDriver: Boolean
+    isFuture: Boolean
+    isSure: Boolean
+  }
+  
   type Ride {
     id: ID
+    title: String
     date: String
-    participants: [User!]
+    from: String
+    to: String
+    price: Int
+    maxPassengers: Int
+    statusHistory: [String]
   }
   type ReadError {
     errorCode: String
@@ -24,14 +36,24 @@ export const schema = buildSchema(`
    error: ReadError
   }
   
+  type UserRidesReadResponse {
+   ride: Ride
+   relation: Relation
+  }
+  
   input UserInput {
     id: ID
     username: String!
     password: String!
   }
   input RideInput {
-    id: ID!
-    date: String!
+    date: String
+    title: String
+    from: String
+    to: String
+    price: Int
+    maxPassengers: Int
+    username: String
   }
   input LoginUserInput {
     username: String!
@@ -41,12 +63,15 @@ export const schema = buildSchema(`
     username: String!
   }
   type Query {
-    getAllUsers: [User]
+    getAllUsers(pagenumber: Int): [User]
+    getAllRides(pagenumber: Int): [Ride]
+    getUserRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUser(username: String): UserReadResponse
   }
   
   type Mutation {
     createUser(input: UserInput): UserReadResponse
+    createRide(input: RideInput): Boolean
     loginUser(input: LoginUserInput): User
     logoutUser(input: LogoutUserInput): Boolean 
   }

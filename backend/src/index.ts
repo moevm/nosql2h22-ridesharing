@@ -4,8 +4,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { graphqlHTTP } from "express-graphql";
 import { schema } from "./graphql-schema";
-import { TCreateUser, TLoginUser, TLogoutUser } from "./definitions";
+import { TCreateUser, TCreateUserRide, TLoginUser, TLogoutUser } from "./definitions";
 import { DbUserController } from "./db/dbUserController";
+import { DbRidesController } from "./db/dbRidesController";
 
 dotenv.config();
 
@@ -15,15 +16,19 @@ console.log(process.env.NEO4J_PASSWORD);
 
 export const driver = neo4j.driver(
   process.env.NEO4J_URI || "bolt://localhost:7687",
-  neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "neo4j")
+  neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "neo4j"),
+  { disableLosslessIntegers: true }
 );
-export const session = driver.session();
 
 const dbUserController = new DbUserController();
+const dbRidesController = new DbRidesController();
 
 const root = {
-  getAllUsers: async () => {
-    return await dbUserController.getAllUsers();
+  getAllUsers: async ({ pagenumber }: { pagenumber: number }) => {
+    return await dbUserController.getAllUsers(pagenumber);
+  },
+  getAllRides: async ({ pagenumber }: { pagenumber: number }) => {
+    return await dbRidesController.getAllRides(pagenumber);
   },
   getUser: async ({ username }: { username: string }) => {
     const res = await dbUserController.getUserByUsername(username);
@@ -36,6 +41,12 @@ const root = {
   },
   loginUser: async ({ input }: { input: TLoginUser }) => {
     return await dbUserController.loginUser(input);
+  },
+  createRide: async ({ input }: { input: TCreateUserRide }) => {
+    return await dbRidesController.createUserRide(input);
+  },
+  getUserRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
+    return await dbRidesController.getUserRides(username, pagenumber);
   },
   createUser: async ({ input }: { input: TCreateUser }) => {
     const readUser = await dbUserController.getUserByUsername(input.username);

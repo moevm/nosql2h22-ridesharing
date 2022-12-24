@@ -21,4 +21,31 @@ export type TCreateUser = Omit<TUser, "id">;
 export type TLoginUser = Omit<TUser, "id">;
 export type TLogoutUser = Pick<TUser, "username">;
 
-export type TRide = {};
+export type TRide = {
+  date: string;
+  from: string;
+  to: string;
+  title: string;
+  price: number;
+  statusHistory: string[];
+  maxPassengers: number;
+};
+
+export type TRelation = {
+  isDriver: boolean;
+  isFuture: boolean;
+  isSure: boolean;
+};
+
+export type TUserRidesReadResponse = {
+  ride: TRide;
+  relation: TRelation;
+};
+
+export enum ERideStatusHistory {
+  CREATED = "CREATED",
+}
+
+export type TCreateUserRide = Omit<TRide, "id" | "statusHistory"> & { username: string };
+
+export const MAX_PAGE_SIZE = 5;
