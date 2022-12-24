@@ -34,7 +34,7 @@ export const AddUserDialog: React.FC = () => {
         }}
         view="normal"
       >
-        Add user
+        Create new account
       </Button>
       <Dialog
         aria-labelledby="app-confirmation-dialog-title"
@@ -47,7 +47,7 @@ export const AddUserDialog: React.FC = () => {
         }}
       >
         <Dialog.Header
-          caption="Add user dialog"
+          caption="Create new account dialog"
           id="app-confirmation-dialog-title"
         />
         <Dialog.Body>
@@ -69,7 +69,7 @@ export const AddUserDialog: React.FC = () => {
           onClickButtonCancel={function onClickButtonCancel() {
             return setOpen(!1);
           }}
-          textButtonApply="Apply"
+          textButtonApply="Create"
           textButtonCancel="Cancel"
         />
       </Dialog>

@@ -6,5 +6,7 @@ export type TUser = {
 };
 
 export type TCreateUser = Omit<TUser, "id">;
+export type TLoginUser = Omit<TUser, "id">;
+export type TLogoutUser = Pick<TUser, "username">;
 
 export type TRide = {};

@@ -1,11 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_ALL_USERS } from "../../graphql/queries/user";
 import { Button, Table } from "@gravity-ui/uikit";
+import { UserContext } from "../../root";
+import { useNavigate } from "react-router-dom";
 
 export const StatisticPage = () => {
   const { data, loading, error, refetch } = useQuery(GET_ALL_USERS);
   const [users, setUsers] = useState([]);
+
+  const { currentUser } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!currentUser.isAuthorized) {
+      navigate("/auth");
+    }
+  }, []);
 
   useEffect(() => {
     if (!loading) {

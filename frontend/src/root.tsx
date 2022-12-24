@@ -1,6 +1,4 @@
-import React from "react";
-
-import { ThemeProvider } from "@gravity-ui/uikit";
+import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import ErrorPage from "./error-page";
@@ -8,21 +6,41 @@ import { AuthPage } from "./pages/authPage";
 import { StatisticPage } from "./pages/statisticPage";
 import { Layout } from "./components/Layout";
 import { UserPage } from "./pages/userPage";
+import { TUser } from "./definitions";
+
+export const UserContext = React.createContext({
+  currentUser: {
+    isAuthorized: false,
+    username: "",
+    id: "",
+  },
+  setCurrentUser: (newValue: TUser) => {},
+});
 
 function Root() {
+  const [currentUser, setUser] = useState({
+    isAuthorized: false,
+    username: "",
+    id: "",
+  });
+
+  function setCurrentUser(newValue: TUser) {
+    setUser(newValue);
+  }
+
   return (
-    <ThemeProvider theme="light">
-      <div className="App">
+    <div className="App">
+      <UserContext.Provider value={{ currentUser, setCurrentUser }}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="statistics" element={<StatisticPage />}></Route>
             <Route path="auth" element={<AuthPage />}></Route>
-            <Route path="user/:id" element={<UserPage />}></Route>
             <Route path="*" element={<ErrorPage />}></Route>
+            <Route path="statistics" element={<StatisticPage />}></Route>
+            <Route path="profile" element={<UserPage />}></Route>
           </Route>
         </Routes>
-      </div>
-    </ThemeProvider>
+      </UserContext.Provider>
+    </div>
   );
 }
 

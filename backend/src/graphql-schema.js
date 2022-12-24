@@ -5,6 +5,7 @@ export const schema = buildSchema(`
     id: ID!
     username: String
     password: String
+    isAuthorized: Boolean
     rides: [Ride]
   }
   type Ride {
@@ -21,7 +22,13 @@ export const schema = buildSchema(`
     id: ID!
     date: String!
   }
-  
+  input LoginUserInput {
+    username: String!
+    password: String!
+  }
+  input LogoutUserInput {
+    username: String!
+  }
   type Query {
     getAllUsers: [User]
     getUser(id: ID): User
@@ -29,6 +36,8 @@ export const schema = buildSchema(`
   
   type Mutation {
     createUser(input: UserInput): User
+    loginUser(input: LoginUserInput): User
+    logoutUser(input: LogoutUserInput): Boolean 
   }
   
 `);

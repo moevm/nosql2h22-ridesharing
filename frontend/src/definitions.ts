@@ -1,7 +1,7 @@
 export type TUser = {
   id: string;
   username: string;
-  rides?: TRide[];
+  isAuthorized: boolean;
 };
 
 export type TCreateUser = Omit<TUser, "id">;

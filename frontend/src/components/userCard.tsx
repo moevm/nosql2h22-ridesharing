@@ -1,9 +1,10 @@
 import React from "react";
 import { TUser } from "../definitions";
-import { User, Card } from "@gravity-ui/uikit";
+import { Card, User } from "@gravity-ui/uikit";
 
-
-export const UserCard: (props: TUser) => JSX.Element = (props: TUser) => {
+export const UserCard: (props: Omit<TUser, "isAuthorized">) => JSX.Element = (
+  props: Omit<TUser, "isAuthorized">
+) => {
   return (
     <Card className="card-stories">
       <User
@@ -12,5 +13,5 @@ export const UserCard: (props: TUser) => JSX.Element = (props: TUser) => {
         name={props.username}
       />
     </Card>
-  )
-}
+  );
+};

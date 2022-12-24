@@ -5,10 +5,13 @@ import "@gravity-ui/uikit/styles/styles.scss";
 
 import { BrowserRouter } from "react-router-dom";
 import Root from "./root";
+import { ThemeProvider } from "@gravity-ui/uikit";
+
+const cache = new InMemoryCache();
 
 const client = new ApolloClient({
   uri: "http://localhost:5001/graphql",
-  cache: new InMemoryCache(),
+  cache,
 });
 
 const root = ReactDOM.createRoot(
@@ -18,7 +21,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <ApolloProvider client={client}>
     <BrowserRouter>
-      <Root />
+      <ThemeProvider theme="light">
+        <Root />
+      </ThemeProvider>
     </BrowserRouter>
   </ApolloProvider>
 );

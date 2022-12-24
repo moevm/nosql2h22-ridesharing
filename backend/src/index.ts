@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { graphqlHTTP } from "express-graphql";
 import { schema } from "./graphql-schema";
-import { TCreateUser } from "./definitions";
+import { TCreateUser, TLoginUser, TLogoutUser } from "./definitions";
 
 dotenv.config();
 
@@ -32,14 +32,61 @@ const root = {
     // @ts-ignore
     return res[0];
   },
+  logoutUser: async ({ input }: { input: TLogoutUser }) => {
+    try {
+      console.log(input);
+      const respRead = await session.run(
+        "MATCH(u : User {username: $username}) SET u.isAuthorized = $authorized RETURN u",
+        {
+          username: input.username.toString(),
+          authorized: false,
+        }
+      );
+      console.log(respRead);
+      if (respRead) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  loginUser: async ({ input }: { input: TLoginUser }) => {
+    try {
+      const respRead = await session.run(
+        "MATCH(u : User {username: $username, password: $password }) SET u.isAuthorized = $authorized RETURN u",
+        {
+          username: input.username.toString(),
+          password: input.password.toString(),
+          authorized: true,
+        }
+      );
+      const res = respRead.records.map((record) => record["_fields"][0].properties);
+      if (!res[0]) {
+        return {
+          id: "",
+          username: "",
+          isAuthorized: false,
+        };
+      }
+      return res[0];
+    } catch (e) {
+      console.error(e);
+    }
+  },
   createUser: async ({ input }: { input: TCreateUser }) => {
     const id = Date.now().toString();
     const user = {
       id,
       username: input.username,
       password: input.password,
+      isAuthorized: false,
     };
-    await session.run("CREATE (a:User {id: $id, username: $username, password: $password  }) RETURN a", { ...user });
+    await session.run(
+      "CREATE (a:User {id: $id, username: $username, password: $password, isAuthorized: $isAuthorized }) RETURN a",
+      { ...user }
+    );
     return user;
   },
 };

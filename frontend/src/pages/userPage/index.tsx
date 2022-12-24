@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
-import { GET_USER } from "../../graphql/queries/user";
+import React, {useContext, useEffect} from "react";
 import { UserCard } from "../../components/userCard";
 
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../root";
 
 export const UserPage = () => {
-  const {id} = useParams();
+  const { currentUser } = useContext(UserContext);
 
-  const {
-    data: oneUser,
-    loading: loadingOneUser,
-    error,
-  } = useQuery(GET_USER, {
-    variables: {
-      id,
-    },
-  });
-  const [user, setUser] = useState({
-    username: "",
-    id: "",
-  });
-
-  console.log(user);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loadingOneUser) {
-      console.log(oneUser, "hi");
-      setUser(oneUser.getUser);
+    if (!currentUser.isAuthorized) {
+      navigate("/auth");
     }
-  }, [oneUser]);
+  }, []);
 
-  return <UserCard username={user.username} id={user.id} />;
+  return <UserCard username={currentUser.username} id={currentUser.id} />;
 };
