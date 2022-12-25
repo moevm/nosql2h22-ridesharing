@@ -101,12 +101,4 @@ export class DbUserController {
       };
     }
   }
-
-  public async getUserRides(username: string): Promise<boolean> {
-    try {
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
 }
