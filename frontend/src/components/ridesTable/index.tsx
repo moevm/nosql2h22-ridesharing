@@ -224,6 +224,7 @@ export const RidesTable = (props: {
             },
           },
         ]}
+        emptyMessage="No data at all ¯\_(ツ)_/¯"
         data={tableData}
         getRowActions={(item) => setupTableActions(item)}
       />

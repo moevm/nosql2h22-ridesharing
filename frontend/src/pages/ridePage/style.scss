@@ -1,0 +1,27 @@
+.ride-page {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.text-input {
+  margin-top: 5px;
+}
+
+.card-ride {
+  margin-bottom: 30px;
+  margin-left: 100px;
+  padding: 30px;
+  width: 700px;
+  height: 700px;
+}
+.status-history {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.participants-table {
+  margin-top: 50px;
+}

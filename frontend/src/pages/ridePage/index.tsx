@@ -1,12 +1,15 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_RIDE } from "../../graphql/queries/ride";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../root";
 import { TRideWithRelation, TUser } from "../../definitions";
 import { RideStatusHistory } from "../../components/rideStatusHistory";
 import { GET_ALL_USERS_IN_RIDE } from "../../graphql/queries/user";
 import { UsersTable } from "../../components/usersTable";
+import { Card, Text } from "@gravity-ui/uikit";
+
+import "./style.scss";
 
 export const RidePage = () => {
   const { id } = useParams();
@@ -66,22 +69,27 @@ export const RidePage = () => {
   }, [loadingPassengers, passengers]);
 
   return (
-    <div className={"profile-page"}>
-      {ride.title}
-      {ride.from}
-      {ride.to}
-      {ride.price}
+    <div className={"ride-page"}>
+      <Card view={"raised"} className="card-ride">
+        <Text variant="display-4"> {ride.title} </Text> <br />
+        <Text variant="code-inline-3"> From: {ride.from} </Text> <br />
+        <Text variant="code-inline-3"> To: {ride.to} </Text> <br />
+        <Text variant="code-inline-3"> Price: {ride.price} </Text> <br />
+        <Card view={"outlined"} className={"participants-table"}>
+          <Text variant="header-2"> Participants:</Text>
+          <UsersTable
+            graphQlMethod={GET_ALL_USERS_IN_RIDE}
+            extractMethod={"getAllUsersInRide"}
+            methodProps={{ id: id ? id : "" }}
+            withPagination={false}
+            tableActions={[]}
+          ></UsersTable>
+        </Card>
 
-      <UsersTable
-        graphQlMethod={GET_ALL_USERS_IN_RIDE}
-        extractMethod={"getAllUsersInRide"}
-        methodProps={{ id: id ? id : "" }}
-        withPagination={false}
-        tableActions={[]}
-      ></UsersTable>
-
-      {/* get all passenger  */}
-      <RideStatusHistory ride={ride} />
+        <div className={"status-history"}>
+          <RideStatusHistory ride={ride} />
+        </div>
+      </Card>
     </div>
   );
 };

@@ -3,7 +3,6 @@ import { DocumentNode, useLazyQuery, useQuery } from "@apollo/client";
 import { MAX_PAGE_SIZE, TableWithAction } from "../../../definitions";
 import { Pagination } from "@mui/material";
 import { TableColumnConfig } from "@gravity-ui/uikit/build/esm/components/Table/Table";
-import { TableActionGroup } from "@gravity-ui/uikit";
 import { TableActionConfig } from "@gravity-ui/uikit/build/esm/components/Table/hoc/withTableActions/withTableActions";
 
 export const AllEntitiesTable = (props: {
@@ -37,6 +36,7 @@ export const AllEntitiesTable = (props: {
 
   useEffect(() => {
     if (!countLoading && countData) {
+      console.log(countData);
       setPageCount(
         Math.floor(countData[props.extractCountMethod] / MAX_PAGE_SIZE) + 1
       );
@@ -61,6 +61,7 @@ export const AllEntitiesTable = (props: {
         className={"ridesharing-table"}
         columns={props.columns}
         data={tableData}
+        emptyMessage="No data at all ¯\_(ツ)_/¯"
         getRowActions={(item) =>
           props.setupTableActions ? props.setupTableActions(item) : []
         }

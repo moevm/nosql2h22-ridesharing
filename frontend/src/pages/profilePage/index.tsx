@@ -5,11 +5,11 @@ import "./style.scss";
 
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../root";
-import { Text } from "@gravity-ui/uikit";
+import { Card, Text } from "@gravity-ui/uikit";
 import {
   GET_USER_INVITED_RIDES,
   GET_USER_PASSED_RIDES,
-  GET_USER_RIDES
+  GET_USER_RIDES,
 } from "../../graphql/queries/user";
 import { RidesTable } from "../../components/ridesTable/index";
 
@@ -38,29 +38,41 @@ export const ProfilePage = () => {
   return (
     <ProfilePageContext.Provider value={{ shouldUpdate, setShouldUpdate }}>
       <div className={"profile-page"}>
-        <Text variant="header-2"> Profile</Text>
-        <UserCard {...currentUser} />
+        <Text className={"page-header"} variant="header-2">
+          Profile of {currentUser.username}
+        </Text>
 
-        <RidesTable
-          currentUser={currentUser}
-          graphQlMethod={GET_USER_RIDES}
-          extractMethod={"getUserRides"}
-          withActions={true}
-        />
+        <div className={"tables"}>
+          <Card view={"raised"} className="card-profile-rides">
+            <Text variant="header-2"> My future rides</Text>
+            <RidesTable
+              currentUser={currentUser}
+              graphQlMethod={GET_USER_RIDES}
+              extractMethod={"getUserRides"}
+              withActions={true}
+            />
+          </Card>
 
-        <RidesTable
-          currentUser={currentUser}
-          graphQlMethod={GET_USER_PASSED_RIDES}
-          extractMethod={"getUserPassedRides"}
-          withActions={false}
-        />
+          <Card view={"raised"} className="card-profile-rides">
+            <Text variant="header-2">Passed rides</Text>
+            <RidesTable
+              currentUser={currentUser}
+              graphQlMethod={GET_USER_PASSED_RIDES}
+              extractMethod={"getUserPassedRides"}
+              withActions={false}
+            />
+          </Card>
 
-        <RidesTable
-          currentUser={currentUser}
-          graphQlMethod={GET_USER_INVITED_RIDES}
-          extractMethod={"getUserInvitations"}
-          withActions={true}
-        />
+          <Card view={"raised"} className="card-profile-rides">
+            <Text variant="header-2">Invitations</Text>
+            <RidesTable
+              currentUser={currentUser}
+              graphQlMethod={GET_USER_INVITED_RIDES}
+              extractMethod={"getUserInvitations"}
+              withActions={true}
+            />
+          </Card>
+        </div>
       </div>
     </ProfilePageContext.Provider>
   );
