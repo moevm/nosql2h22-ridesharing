@@ -7,6 +7,8 @@ import { schema } from "./graphql-schema";
 import { TCreateUser, TCreateUserRide, TLoginUser, TLogoutUser } from "./definitions";
 import { DbUserController } from "./db/dbUserController";
 import { DbRidesController } from "./db/dbRidesController";
+import { DbGeneralController } from "./db/dbGeneralController";
+import * as fs from "fs";
 
 dotenv.config();
 
@@ -22,6 +24,7 @@ export const driver = neo4j.driver(
 
 const dbUserController = new DbUserController();
 const dbRidesController = new DbRidesController();
+const dbGeneralController = new DbGeneralController();
 
 const root = {
   getAllUsers: async ({ pagenumber }: { pagenumber: number }) => {
@@ -92,13 +95,21 @@ const root = {
 
 const app = express();
 
+app.use(cors());
+
 app.listen(5001, async () => {
   const servInfo = await driver.getServerInfo();
   console.log(servInfo);
   console.log("server started at port 5001");
 });
 
-app.use(cors());
+app.get("/download", async (req, res) => {
+  const json = await dbGeneralController.downloadDB();
+
+  fs.writeFileSync("./src/all.json", json.toString());
+
+  res.sendFile("./all.json", { root: __dirname });
+});
 
 app.use(
   "/graphql",
