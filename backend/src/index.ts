@@ -27,12 +27,17 @@ const root = {
   getAllUsers: async ({ pagenumber }: { pagenumber: number }) => {
     return await dbUserController.getAllUsers(pagenumber);
   },
+  getAllUsersCount: async () => {
+    return await dbUserController.getAllUsersCount();
+  },
   getAllRides: async ({ pagenumber }: { pagenumber: number }) => {
     return await dbRidesController.getAllRides(pagenumber);
   },
+  getAllRidesCount: async () => {
+    return await dbRidesController.getAllRidesCount();
+  },
   getUser: async ({ username }: { username: string }) => {
     const res = await dbUserController.getUserByUsername(username);
-    console.log(res);
     // @ts-ignore
     return res[0];
   },
@@ -45,8 +50,17 @@ const root = {
   createRide: async ({ input }: { input: TCreateUserRide }) => {
     return await dbRidesController.createUserRide(input);
   },
+  getRide: async ({ id, username }: { id: string, username: string }) => {
+    return await dbRidesController.getRide(id, username);
+  },
   getUserRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserRides(username, pagenumber);
+  },
+  getUserPassedRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
+    return await dbRidesController.getUserPassedRides(username, pagenumber);
+  },
+  getUserInvitations: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
+    return await dbRidesController.getUserInvitations(username, pagenumber);
   },
   createUser: async ({ input }: { input: TCreateUser }) => {
     const readUser = await dbUserController.getUserByUsername(input.username);

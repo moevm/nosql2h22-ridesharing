@@ -17,6 +17,14 @@ export type TUserReadResponse = {
   error?: TReadError;
 };
 
+export type TTableDataReadCount = {
+  count: number;
+};
+
+export type TAllUsersReadResponse = {
+  users: TUser[];
+} & TTableDataReadCount;
+
 export type TCreateUser = Omit<TUser, "id">;
 export type TLoginUser = Omit<TUser, "id">;
 export type TLogoutUser = Pick<TUser, "username">;
@@ -37,9 +45,13 @@ export type TRelation = {
   isSure: boolean;
 };
 
-export type TUserRidesReadResponse = {
+export type TRideReadResponse = {
   ride: TRide;
   relation: TRelation;
+};
+
+export type TUserRidesReadResponse = TRideReadResponse & {
+  count: number;
 };
 
 export enum ERideStatusHistory {

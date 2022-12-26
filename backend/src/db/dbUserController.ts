@@ -1,5 +1,5 @@
 import { MAX_PAGE_SIZE, TCreateUser, TLoginUser, TLogoutUser, TUser, TUserReadResponse } from "../definitions";
-import { driver, } from "../index";
+import { driver } from "../index";
 import neo4j from "neo4j-driver";
 
 export class DbUserController {
@@ -20,18 +20,34 @@ export class DbUserController {
   }
 
   public async getAllUsers(pagenumber: number): Promise<TUser[]> {
+    const _session = driver.session();
     try {
-      const respRead = await this.session.readTransaction((tcx) =>
+      const respRead = await _session.readTransaction((tcx) =>
         tcx.run("MATCH (u:USER) RETURN u ORDER by u.id SKIP $pagination LIMIT $pageSize", {
           pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
           pageSize: neo4j.int(MAX_PAGE_SIZE),
         })
       );
       const res = respRead.records.map((record) => record["_fields"][0].properties);
+      _session.close();
+
       return res as TUser[];
     } catch (error) {
       console.error(error);
+      _session.close();
+
       return [];
+    }
+  }
+
+  public async getAllUsersCount(): Promise<number> {
+    try {
+      const respRead = await this.session.readTransaction((tcx) => tcx.run("MATCH (u: USER) RETURN count(u)"));
+      const res = respRead.records.map((record) => record["_fields"][0]);
+      return res[0];
+    } catch (error) {
+      console.error(error);
+      return 0;
     }
   }
 

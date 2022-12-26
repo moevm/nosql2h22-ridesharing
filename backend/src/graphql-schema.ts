@@ -36,9 +36,15 @@ export const schema = buildSchema(`
    error: ReadError
   }
   
+  type RideReadResponse {
+   ride: Ride
+   relation: Relation
+  }
+  
   type UserRidesReadResponse {
    ride: Ride
    relation: Relation
+   count: Int
   }
   
   input UserInput {
@@ -64,9 +70,14 @@ export const schema = buildSchema(`
   }
   type Query {
     getAllUsers(pagenumber: Int): [User]
+    getAllUsersCount: Int
     getAllRides(pagenumber: Int): [Ride]
+    getAllRidesCount: Int
     getUserRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
+    getUserPassedRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
+    getUserInvitations(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUser(username: String): UserReadResponse
+    getRide(id: String, username: String): RideReadResponse
   }
   
   type Mutation {
