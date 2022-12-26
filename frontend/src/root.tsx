@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { ProfilePage } from "./pages/profilePage";
 import { TUser } from "./definitions";
 import { RidesPage } from "./pages/ridesPage";
+import { RidePage } from "./pages/ridePage";
 
 export const UserContext = React.createContext({
   currentUser: {
@@ -41,6 +42,7 @@ function Root() {
             <Route path="statistics" element={<StatisticPage />}></Route>
             <Route path="profile" element={<ProfilePage />}></Route>
             <Route path="rides" element={<RidesPage />}></Route>
+            <Route path="ride/:id" element={<RidePage />}></Route>
           </Route>
         </Routes>
       </UserContext.Provider>

@@ -2,7 +2,13 @@ import React, { useContext, useEffect } from "react";
 import { UserContext } from "../../root";
 import { useNavigate } from "react-router-dom";
 import { AllEntitiesTable } from "./components/allEntitiesTable";
-import { GET_ALL_RIDES, GET_ALL_USERS } from "../../graphql/queries/user";
+import {
+  GET_ALL_RIDES,
+  GET_ALL_RIDES_COUNT,
+  GET_ALL_USERS,
+  GET_ALL_USERS_COUNT,
+} from "../../graphql/queries/user";
+import { RideStatusHistory } from "../../components/rideStatusHistory";
 
 export const StatisticPage = () => {
   const { currentUser } = useContext(UserContext);
@@ -19,7 +25,9 @@ export const StatisticPage = () => {
     <div>
       <AllEntitiesTable
         graphQlMethod={GET_ALL_USERS}
+        graphQlCountMethod={GET_ALL_USERS_COUNT}
         extractMethod={"getAllUsers"}
+        extractCountMethod={"getAllUsersCount"}
         columns={[
           {
             id: "username",
@@ -33,7 +41,9 @@ export const StatisticPage = () => {
       ></AllEntitiesTable>
       <AllEntitiesTable
         graphQlMethod={GET_ALL_RIDES}
+        graphQlCountMethod={GET_ALL_RIDES_COUNT}
         extractMethod={"getAllRides"}
+        extractCountMethod={"getAllRidesCount"}
         columns={[
           {
             id: "title",
@@ -56,9 +66,11 @@ export const StatisticPage = () => {
             name: "maxPassengers",
           },
           {
-            id: "statusHistory",
-            name: "statusHistory",
-            template: (item) => item.statusHistory.join(";"),
+            id: "id",
+            name: "",
+            template: (item) => {
+              return <RideStatusHistory ride={item} />;
+            },
           },
         ]}
       ></AllEntitiesTable>

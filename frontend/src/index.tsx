@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import "@gravity-ui/uikit/styles/styles.scss";
+import "./globalStyles.scss";
 
 import { BrowserRouter } from "react-router-dom";
 import Root from "./root";

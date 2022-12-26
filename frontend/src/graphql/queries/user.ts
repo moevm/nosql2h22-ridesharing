@@ -10,6 +10,20 @@ export const GET_ALL_USERS = gql`
   }
 `;
 
+export const GET_ALL_USERS_COUNT = gql`
+    query getAllUsersCount {
+        getAllUsersCount
+    }
+`;
+
+export const GET_ALL_RIDES_COUNT = gql`
+    query getAllRidesCount {
+        getAllRidesCount
+    }
+`;
+
+
+
 export const GET_USER = gql`
   query getUser($username: String) {
     getUser(username: $username) {
@@ -52,6 +66,30 @@ export const GET_USER_RIDES = gql`
         isFuture
         isSure
       }
+      count  
     }
   }
+`;
+
+export const GET_USER_PASSED_RIDES = gql`
+    query getUserPassedRides($username: String, $pagenumber: Int) {
+      getUserPassedRides(username: $username, pagenumber: $pagenumber) {
+        ride {
+          id
+          title
+          date
+          from
+          to
+          price
+          maxPassengers
+          statusHistory
+        }
+        relation {
+          isDriver
+          isFuture
+          isSure
+        }
+        count
+      }
+    }
 `;

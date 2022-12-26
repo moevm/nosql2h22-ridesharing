@@ -20,7 +20,7 @@ export type TRide = {
   to: string;
   title: string;
   price: number;
-  statusHistory?: ERideStatusHistory;
+  statusHistory?: ERideStatusHistory[];
   maxPassengers: number;
 };
 
@@ -29,3 +29,5 @@ export type TRelation = {
   isFuture: boolean;
   isSure: boolean;
 };
+
+export const MAX_PAGE_SIZE = 5;
