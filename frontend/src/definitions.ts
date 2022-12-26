@@ -14,6 +14,10 @@ export enum ERideStatusHistory {
 }
 
 export type TRideWithRelation = TRide & TRelation;
+export type TRideWithRelationComplex = {
+  ride: TRide;
+  relation: TRelation;
+}
 
 export type TRide = {
   id: string;

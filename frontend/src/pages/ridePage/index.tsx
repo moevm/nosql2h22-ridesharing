@@ -77,6 +77,7 @@ export const RidePage = () => {
         extractMethod={"getAllUsersInRide"}
         methodProps={{ id: id ? id : "" }}
         withPagination={false}
+        tableActions={[]}
       ></UsersTable>
 
       {/* get all passenger  */}

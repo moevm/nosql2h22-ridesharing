@@ -1,13 +1,15 @@
-import { MAX_PAGE_SIZE, TableWithAction } from "../../definitions";
+import { MAX_PAGE_SIZE, TableWithAction, TUser } from "../../definitions";
 import { DocumentNode, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
+import { TableActionConfig } from "@gravity-ui/uikit";
 
 export const UsersTable = (props: {
   graphQlMethod: DocumentNode;
   methodProps: { id: string };
   extractMethod: string;
   withPagination: boolean;
+  tableActions: TableActionConfig<TUser>[];
 }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(MAX_PAGE_SIZE);
@@ -50,24 +52,7 @@ export const UsersTable = (props: {
           },
         ]}
         data={tableData}
-        getRowActions={function getRowActions(item: any, index: any) {
-          return [
-            {
-              text: "default",
-              handler: function handler() {
-                return alert(JSON.stringify(item));
-              },
-            },
-            { text: "disabled", disabled: !0, handler: function handler() {} },
-            {
-              text: "danger theme",
-              theme: "danger",
-              handler: function handler() {
-                return alert(index);
-              },
-            },
-          ];
-        }}
+        getRowActions={() => props.tableActions}
       />
       {props.withPagination && (
         <Pagination count={pageCount} page={pageNumber} color="primary" />

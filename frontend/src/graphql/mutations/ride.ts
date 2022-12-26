@@ -12,8 +12,20 @@ export const DELETE_RIDE = gql`
   }
 `;
 
+export const SEND_RIDE_INVITATION = gql`
+    mutation sendRideInvitation($input: RideInvitationInput) {
+        sendRideInvitation(input: $input)
+    }
+`;
+
 export const RESOLVE_RIDE = gql`
     mutation markRideAsResolved($input: markRideAsResolvedInput) {
         markRideAsResolved(input: $input)
+    }
+`;
+
+export const ACCEPT_INVITE = gql`
+    mutation acceptInvitation($input: RideAcceptInvitationInput) {
+        acceptInvitation(input: $input)
     }
 `;

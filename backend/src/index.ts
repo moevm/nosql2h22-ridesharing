@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { graphqlHTTP } from "express-graphql";
 import { schema } from "./graphql-schema";
-import { TCreateUser, TCreateUserRide, TLoginUser, TLogoutUser } from "./definitions";
+import { TCreateUser, TCreateUserRide, TLoginUser, TLogoutUser, TRideInvitationInput } from "./definitions";
 import { DbUserController } from "./db/dbUserController";
 import { DbRidesController } from "./db/dbRidesController";
 import { DbGeneralController } from "./db/dbGeneralController";
@@ -73,6 +73,12 @@ const root = {
   },
   getUserInvitations: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserInvitations(username, pagenumber);
+  },
+  sendRideInvitation: async ({ input }: { input: TRideInvitationInput }) => {
+    return await dbRidesController.sendInvitationToRide(input.rideId, input.userId);
+  },
+  acceptInvitation: async ({ input }: { input: TRideInvitationInput }) => {
+    return await dbRidesController.acceptInvitation(input.rideId, input.userId);
   },
   createUser: async ({ input }: { input: TCreateUser }) => {
     const readUser = await dbUserController.getUserByUsername(input.username);

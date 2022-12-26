@@ -37,6 +37,7 @@ export type TRide = {
   price: number;
   statusHistory: string[];
   maxPassengers: number;
+  id: string;
 };
 
 export type TRelation = {
@@ -57,6 +58,11 @@ export type TUserRidesReadResponse = TRideReadResponse & {
 export enum ERideStatusHistory {
   CREATED = "CREATED",
 }
+
+export type TRideInvitationInput = {
+  rideId: string;
+  userId: string;
+};
 
 export type TCreateUserRide = Omit<TRide, "id" | "statusHistory"> & { username: string };
 

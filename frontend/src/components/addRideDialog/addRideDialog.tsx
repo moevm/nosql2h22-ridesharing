@@ -1,4 +1,4 @@
-import { Button, Dialog, TextInput, useToaster } from "@gravity-ui/uikit";
+import { Button, Dialog, Label, TextInput, useToaster } from "@gravity-ui/uikit";
 import React, { useContext, useEffect, useState } from "react";
 import { TRide } from "../../definitions";
 import { UserContext } from "../../root";
@@ -116,6 +116,7 @@ export const AddRideDialog: React.FC = () => {
             value={rideForm.to}
             placeholder="to"
           />
+          <Label>Price</Label>
           <TextInput
             className={"text-input"}
             onUpdate={(newValue) =>
@@ -125,6 +126,7 @@ export const AddRideDialog: React.FC = () => {
             value={rideForm.price.toString()}
             placeholder="price"
           />
+          <Label>Max passengers</Label>
           <TextInput
             className={"text-input"}
             onUpdate={(newValue) =>

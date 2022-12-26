@@ -102,3 +102,26 @@ export const GET_USER_PASSED_RIDES = gql`
       }
     }
 `;
+
+export const GET_USER_INVITED_RIDES = gql`
+    query getUserInvitations($username: String, $pagenumber: Int) {
+        getUserInvitations(username: $username, pagenumber: $pagenumber) {
+            ride {
+                id
+                title
+                date
+                from
+                to
+                price
+                maxPassengers
+                statusHistory
+            }
+            relation {
+                isDriver
+                isFuture
+                isSure
+            }
+            count
+        }
+    }
+`;

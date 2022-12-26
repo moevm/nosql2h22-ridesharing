@@ -7,8 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../root";
 import { Text } from "@gravity-ui/uikit";
 import {
+  GET_USER_INVITED_RIDES,
   GET_USER_PASSED_RIDES,
-  GET_USER_RIDES,
+  GET_USER_RIDES
 } from "../../graphql/queries/user";
 import { RidesTable } from "../../components/ridesTable/index";
 
@@ -52,6 +53,13 @@ export const ProfilePage = () => {
           graphQlMethod={GET_USER_PASSED_RIDES}
           extractMethod={"getUserPassedRides"}
           withActions={false}
+        />
+
+        <RidesTable
+          currentUser={currentUser}
+          graphQlMethod={GET_USER_INVITED_RIDES}
+          extractMethod={"getUserInvitations"}
+          withActions={true}
         />
       </div>
     </ProfilePageContext.Provider>

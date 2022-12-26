@@ -90,10 +90,60 @@ export class DbRidesController {
     }
   }
 
-  public async getUserInvitations(username: string, pagination: number): Promise<TUserRidesReadResponse[]> {
+  public async acceptInvitation(rideId: string, userId: string): Promise<boolean> {
+    const _session = driver.session();
+    try {
+      const response = await _session.run(
+        "MATCH (u: USER {id:$userId})-[edge:RELATES]-(r: RIDE {id: $rideId}) " +
+          "set edge.isSure = $isSure " +
+          "set r.statusHistory=$accepted + r.statusHistory return edge;",
+        {
+          userId,
+          rideId,
+          isSure: true,
+          accepted: [`ACCEPTED_BY_${userId}:${Date.now()}`],
+        }
+      );
+      console.log(response);
+      _session.close();
+
+      return true;
+    } catch (error) {
+      console.error(error);
+
+      _session.close();
+
+      return false;
+    }
+  }
+
+  public async sendInvitationToRide(rideId: string, userId: string): Promise<boolean> {
     try {
       const response = await this.session.run(
-        "match (u: USER {username: $username}) -[edge:RELATES {isSure: isSure}] - (r: RIDE) return  r, edge " +
+        "match (u: USER {id: $userId})  " +
+          "match (r: RIDE {id: $rideId})" +
+          "set r.statusHistory=$invited + r.statusHistory " +
+          "create (u)-[:RELATES {isDriver: false, isFuture: true, isSure: false}]->(r)  return u",
+        {
+          userId,
+          rideId,
+          invited: [`INVITED_USER${userId}:${Date.now()}`],
+        }
+      );
+
+      return true;
+    } catch (error) {
+      console.log(error);
+
+      return false;
+    }
+  }
+
+  public async getUserInvitations(username: string, pagination: number): Promise<TUserRidesReadResponse[]> {
+    const _session = driver.session();
+    try {
+      const response = await _session.run(
+        "match (u: USER {username: $username}) -[edge:RELATES {isSure: $isSure}] - (r: RIDE) return  r, edge " +
           "ORDER BY r.id SKIP $pagination LIMIT $pageSize",
         {
           isSure: false,
@@ -110,6 +160,8 @@ export class DbRidesController {
       }));
 
       console.log(res);
+
+      _session.close();
 
       return res;
     } catch (error) {
@@ -153,11 +205,11 @@ export class DbRidesController {
     try {
       const response = await this.session.run(
         "match (u: USER {username: $username}) -[edge:RELATES {isFuture:$isFuture}] - (r: RIDE) return  r, edge " +
-          "ORDER BY r.id SKIP $pagination LIMIT $pageSize",
+          "ORDER BY r.id SKIP toInteger($pagination) LIMIT toInteger($pageSize)",
         {
           username,
-          pagination: neo4j.int((pagination - 1) * MAX_PAGE_SIZE),
-          pageSize: neo4j.int(MAX_PAGE_SIZE),
+          pagination: pagination === 0 ? 0 : neo4j.int((pagination - 1) * MAX_PAGE_SIZE),
+          pageSize: pagination === 0 ? 1000 : neo4j.int(MAX_PAGE_SIZE),
           isFuture: true,
         }
       );
@@ -180,6 +232,8 @@ export class DbRidesController {
         relation: record["_fields"][1].properties as TRelation,
         count: response.records.length,
       }));
+
+      console.log(res);
 
       _session.close();
 

@@ -10,7 +10,11 @@ import {
 import { DocumentNode, useMutation, useQuery } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DELETE_RIDE, RESOLVE_RIDE } from "../../graphql/mutations/ride";
+import {
+  ACCEPT_INVITE,
+  DELETE_RIDE,
+  RESOLVE_RIDE,
+} from "../../graphql/mutations/ride";
 import { TableActionConfig, useToaster } from "@gravity-ui/uikit";
 import { ProfilePageContext } from "../../pages/profilePage";
 
@@ -38,6 +42,33 @@ export const RidesTable = (props: {
 
   const [deleteRide] = useMutation(DELETE_RIDE);
   const [resolveRide] = useMutation(RESOLVE_RIDE);
+  const [acceptInvite] = useMutation(ACCEPT_INVITE);
+
+  const acceptInviteCb = (rideId: string) => {
+    acceptInvite({
+      variables: {
+        input: {
+          rideId,
+          userId: props.currentUser.id,
+        },
+      },
+    }).then((response) => {
+      refetch({
+        pagenumber: pageNumber,
+        username: props.currentUser.username,
+      });
+
+      setShouldUpdate(true);
+
+      add({
+        name: "Done",
+        title: "Invite accepted",
+        type: "success",
+        allowAutoHiding: true,
+        timeout: 5000,
+      });
+    });
+  };
 
   const deleteRideCb = (rideId: string) => {
     deleteRide({
@@ -51,6 +82,8 @@ export const RidesTable = (props: {
         pagenumber: pageNumber,
         username: props.currentUser.username,
       });
+
+      setShouldUpdate(true);
 
       add({
         name: "Done",
@@ -114,6 +147,15 @@ export const RidesTable = (props: {
           text: "Mark as completed",
           handler: function handler() {
             resolveRideCb(item.id);
+          },
+        },
+      ];
+    } else if (!item.isSure) {
+      return [
+        {
+          text: "Accept invitation",
+          handler: function handler() {
+            acceptInviteCb(item.id);
           },
         },
       ];

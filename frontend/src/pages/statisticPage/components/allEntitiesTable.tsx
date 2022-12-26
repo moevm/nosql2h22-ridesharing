@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { DocumentNode, useLazyQuery, useQuery } from "@apollo/client";
-import { MAX_PAGE_SIZE } from "../../../definitions";
-import { Table } from "@gravity-ui/uikit";
+import { MAX_PAGE_SIZE, TableWithAction } from "../../../definitions";
 import { Pagination } from "@mui/material";
 import { TableColumnConfig } from "@gravity-ui/uikit/build/esm/components/Table/Table";
+import { TableActionGroup } from "@gravity-ui/uikit";
+import { TableActionConfig } from "@gravity-ui/uikit/build/esm/components/Table/hoc/withTableActions/withTableActions";
 
 export const AllEntitiesTable = (props: {
   columns: TableColumnConfig<any>[];
@@ -11,6 +12,7 @@ export const AllEntitiesTable = (props: {
   graphQlCountMethod: DocumentNode;
   extractMethod: string;
   extractCountMethod: string;
+  setupTableActions?: (item: any) => TableActionConfig<any>[];
 }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(MAX_PAGE_SIZE);
@@ -55,10 +57,13 @@ export const AllEntitiesTable = (props: {
 
   return (
     <>
-      <Table
+      <TableWithAction
         className={"ridesharing-table"}
         columns={props.columns}
         data={tableData}
+        getRowActions={(item) =>
+          props.setupTableActions ? props.setupTableActions(item) : []
+        }
       />
       <Pagination
         count={pageCount}
