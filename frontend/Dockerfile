@@ -1,6 +1,8 @@
-FROM node:14.20.1-buster
-WORKDIR /frontend
-COPY package.json .
-RUN npm install
-COPY . .
+FROM node:alpine
+WORKDIR /app
+COPY package.json ./
+COPY package-lock.json ./
+COPY ./ ./
+RUN npm i
+CMD ["npm", "run", "start"]
 EXPOSE 3000

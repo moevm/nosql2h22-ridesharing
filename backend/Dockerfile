@@ -1,6 +1,8 @@
-FROM node:14.20.1-buster
+FROM node:alpine
 WORKDIR /app
-COPY package.json .
-RUN npm install
-COPY . .
+COPY package.json ./
+COPY package-lock.json ./
+COPY ./ ./
+RUN npm i
+CMD ["npm", "run", "start"]
 EXPOSE 5001
