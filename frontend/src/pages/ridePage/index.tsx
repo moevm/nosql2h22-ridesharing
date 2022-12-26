@@ -3,13 +3,18 @@ import { useQuery } from "@apollo/client";
 import { GET_RIDE } from "../../graphql/queries/ride";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../root";
-import { TRideWithRelation } from "../../definitions";
+import { TRideWithRelation, TUser } from "../../definitions";
+import { RideStatusHistory } from "../../components/rideStatusHistory";
+import { GET_ALL_USERS_IN_RIDE } from "../../graphql/queries/user";
+import { UsersTable } from "../../components/usersTable";
 
 export const RidePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { currentUser } = useContext(UserContext);
+
+  const [users, setUsers] = useState<TUser[]>([]);
 
   const [ride, setRide] = useState<TRideWithRelation>({
     date: "",
@@ -38,6 +43,15 @@ export const RidePage = () => {
     },
   });
 
+  const { data: passengers, loading: loadingPassengers } = useQuery(
+    GET_ALL_USERS_IN_RIDE,
+    {
+      variables: {
+        id,
+      },
+    }
+  );
+
   useEffect(() => {
     if (!loading && data) {
       // @ts-ignore
@@ -45,8 +59,28 @@ export const RidePage = () => {
     }
   }, [loading, data]);
 
-  return <>
-    {ride.title}
-    {ride.from}
-  </>;
+  useEffect(() => {
+    if (!loadingPassengers && passengers) {
+      setUsers([passengers.getAllUsersInRide]);
+    }
+  }, [loadingPassengers, passengers]);
+
+  return (
+    <div className={"profile-page"}>
+      {ride.title}
+      {ride.from}
+      {ride.to}
+      {ride.price}
+
+      <UsersTable
+        graphQlMethod={GET_ALL_USERS_IN_RIDE}
+        extractMethod={"getAllUsersInRide"}
+        methodProps={{ id: id ? id : "" }}
+        withPagination={false}
+      ></UsersTable>
+
+      {/* get all passenger  */}
+      <RideStatusHistory ride={ride} />
+    </div>
+  );
 };

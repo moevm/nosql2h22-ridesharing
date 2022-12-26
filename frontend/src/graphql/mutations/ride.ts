@@ -5,3 +5,15 @@ export const CREATE_RIDE = gql`
         createRide(input: $input)
     }
 `;
+
+export const DELETE_RIDE = gql`
+  mutation deleteRide($input: RideDeleteInput) {
+      deleteRide(input: $input)
+  }
+`;
+
+export const RESOLVE_RIDE = gql`
+    mutation markRideAsResolved($input: markRideAsResolvedInput) {
+        markRideAsResolved(input: $input)
+    }
+`;

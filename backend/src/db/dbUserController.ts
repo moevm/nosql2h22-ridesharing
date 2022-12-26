@@ -103,7 +103,7 @@ export class DbUserController {
         isAdmin: false,
       };
       await this.session.run(
-        "CREATE (a:USER {id: $id, username: $username, password: $password, isAuthorized: $isAuthorized, " +
+        "CREATE (a:USER {id: randomUUID(), username: $username, password: $password, isAuthorized: $isAuthorized, " +
           "isAdmin: $isAdmin }) RETURN a",
         { ...user }
       );

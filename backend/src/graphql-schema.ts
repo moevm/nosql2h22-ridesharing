@@ -68,6 +68,15 @@ export const schema = buildSchema(`
   input LogoutUserInput {
     username: String!
   }
+  
+  input RideDeleteInput {
+    id: ID
+  }
+  
+   input markRideAsResolvedInput {
+    id: ID
+  }
+  
   type Query {
     getAllUsers(pagenumber: Int): [User]
     getAllUsersCount: Int
@@ -77,7 +86,8 @@ export const schema = buildSchema(`
     getUserPassedRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUserInvitations(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUser(username: String): UserReadResponse
-    getRide(id: String, username: String): RideReadResponse
+    getRide(id: ID, username: String): RideReadResponse
+    getAllUsersInRide(id: ID): [User]
   }
   
   type Mutation {
@@ -85,6 +95,8 @@ export const schema = buildSchema(`
     createRide(input: RideInput): Boolean
     loginUser(input: LoginUserInput): User
     logoutUser(input: LogoutUserInput): Boolean 
+    deleteRide(input: RideDeleteInput): Boolean 
+    markRideAsResolved(input: markRideAsResolvedInput): Boolean 
   }
   
 `);

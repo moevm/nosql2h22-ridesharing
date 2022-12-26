@@ -10,6 +10,15 @@ export const GET_ALL_USERS = gql`
   }
 `;
 
+export const GET_ALL_USERS_IN_RIDE = gql`
+    query getAllUsersInRide($id: ID) {
+        getAllUsersInRide(id: $id) {
+            id,
+            username
+        }
+    }
+`
+
 export const GET_ALL_USERS_COUNT = gql`
     query getAllUsersCount {
         getAllUsersCount

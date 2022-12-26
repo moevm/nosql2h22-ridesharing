@@ -1,3 +1,5 @@
+import { Table, withTableActions } from "@gravity-ui/uikit";
+
 export type TUser = {
   id: string;
   username: string;
@@ -31,3 +33,5 @@ export type TRelation = {
 };
 
 export const MAX_PAGE_SIZE = 5;
+
+export const TableWithAction = withTableActions<any>(Table);

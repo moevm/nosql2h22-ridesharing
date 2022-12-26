@@ -41,6 +41,15 @@ const root = {
     // @ts-ignore
     return res[0];
   },
+  getAllUsersInRide: async ({ id }: { id: string }) => {
+    return await dbRidesController.getAllUsersInRide(id);
+  },
+  deleteRide: async ({ input }: { input: { id: string } }) => {
+    return dbRidesController.deleteRide(input.id);
+  },
+  markRideAsResolved: async ({ input }: { input: { id: string } }) => {
+    return dbRidesController.markRideAsResolved(input.id);
+  },
   logoutUser: async ({ input }: { input: TLogoutUser }) => {
     return await dbUserController.logoutUser(input);
   },
@@ -50,7 +59,7 @@ const root = {
   createRide: async ({ input }: { input: TCreateUserRide }) => {
     return await dbRidesController.createUserRide(input);
   },
-  getRide: async ({ id, username }: { id: string, username: string }) => {
+  getRide: async ({ id, username }: { id: string; username: string }) => {
     return await dbRidesController.getRide(id, username);
   },
   getUserRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {

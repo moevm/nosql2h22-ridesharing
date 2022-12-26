@@ -1,24 +1,31 @@
 import { Pagination } from "@mui/material";
 import {
   MAX_PAGE_SIZE,
+  TableWithAction,
   TRelation,
   TRide,
   TRideWithRelation,
   TUser,
 } from "../../definitions";
-import { DocumentNode, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import { Table } from "@gravity-ui/uikit";
-import { RideStatusHistory } from "../rideStatusHistory";
+import { DocumentNode, useMutation, useQuery } from "@apollo/client";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DELETE_RIDE, RESOLVE_RIDE } from "../../graphql/mutations/ride";
+import { TableActionConfig, useToaster } from "@gravity-ui/uikit";
+import { ProfilePageContext } from "../../pages/profilePage";
 
 export const RidesTable = (props: {
   graphQlMethod: DocumentNode;
   extractMethod: string;
   currentUser: TUser;
+  withActions: boolean;
 }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(MAX_PAGE_SIZE);
+
+  const { shouldUpdate, setShouldUpdate } = useContext(ProfilePageContext);
+
+  const { add } = useToaster();
 
   const navigate = useNavigate();
 
@@ -29,12 +36,94 @@ export const RidesTable = (props: {
     },
   });
 
+  const [deleteRide] = useMutation(DELETE_RIDE);
+  const [resolveRide] = useMutation(RESOLVE_RIDE);
+
+  const deleteRideCb = (rideId: string) => {
+    deleteRide({
+      variables: {
+        input: {
+          id: rideId,
+        },
+      },
+    }).then((response) => {
+      refetch({
+        pagenumber: pageNumber,
+        username: props.currentUser.username,
+      });
+
+      add({
+        name: "Done",
+        title: "Ride deleted",
+        type: "success",
+        allowAutoHiding: true,
+        timeout: 5000,
+      });
+    });
+  };
+
+  useEffect(() => {
+    setShouldUpdate(false);
+  });
+
+  useEffect(() => {
+    refetch({
+      pagenumber: pageNumber,
+      username: props.currentUser.username,
+    });
+  }, [setShouldUpdate]);
+
+  const resolveRideCb = (rideId: string) => {
+    resolveRide({
+      variables: {
+        input: {
+          id: rideId,
+        },
+      },
+    }).then((response) => {
+      refetch({
+        pagenumber: pageNumber,
+        username: props.currentUser.username,
+      });
+
+      setShouldUpdate(true);
+
+      add({
+        name: "Done",
+        title: "Ride marked as completed",
+        type: "success",
+        allowAutoHiding: true,
+        timeout: 5000,
+      });
+    });
+  };
+
+  const setupTableActions = (
+    item: TRideWithRelation
+  ): TableActionConfig<TRideWithRelation>[] => {
+    if (!props.withActions) return [];
+    if (item.isDriver) {
+      return [
+        {
+          text: "Delete",
+          handler: function handler() {
+            deleteRideCb(item.id);
+          },
+        },
+        {
+          text: "Mark as completed",
+          handler: function handler() {
+            resolveRideCb(item.id);
+          },
+        },
+      ];
+    } else return [];
+  };
+
   const [tableData, setTableData] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && data) {
-      console.log(data);
-
       if (!data[props.extractMethod].length) {
         setTableData([]);
         return;
@@ -49,7 +138,8 @@ export const RidesTable = (props: {
 
       setTableData(rides);
 
-      const count = Math.floor(data.getUserRides[0]?.count / MAX_PAGE_SIZE) + 1;
+      const count =
+        Math.floor(data[props.extractMethod]?.count / MAX_PAGE_SIZE) + 1;
 
       setPageCount(count ? count : pageCount);
     }
@@ -57,11 +147,11 @@ export const RidesTable = (props: {
 
   return (
     <>
-      <Table
+      <TableWithAction
         className={"ridesharing-table"}
         onRowClick={(event) => {
           console.log(event);
-          navigate(`/ride/${event.id}`)
+          navigate(`/ride/${event.id}`);
         }}
         columns={[
           {
@@ -91,15 +181,9 @@ export const RidesTable = (props: {
               return item.isDriver ? "Yes" : "No";
             },
           },
-          {
-            id: "id",
-            name: "",
-            template: (item) => {
-              return <RideStatusHistory ride={item} />;
-            },
-          },
         ]}
         data={tableData}
+        getRowActions={(item) => setupTableActions(item)}
       />
       <Pagination
         count={pageCount}
