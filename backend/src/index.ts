@@ -28,17 +28,17 @@ const dbRidesController = new DbRidesController();
 const dbGeneralController = new DbGeneralController();
 
 const root = {
-  getAllUsers: async ({ pagenumber }: { pagenumber: number }) => {
-    return await dbUserController.getAllUsers(pagenumber);
+  getAllUsers: async ({ pagenumber, query }: { pagenumber: number; query?: string }) => {
+    return await dbUserController.getAllUsers(pagenumber, query);
   },
-  getAllUsersCount: async () => {
-    return await dbUserController.getAllUsersCount();
+  getAllUsersCount: async ({ query }: { query?: string }) => {
+    return await dbUserController.getAllUsersCount(query);
   },
-  getAllRides: async ({ pagenumber }: { pagenumber: number }) => {
-    return await dbRidesController.getAllRides(pagenumber);
+  getAllRides: async ({ pagenumber, query }: { pagenumber: number; query?: string }) => {
+    return await dbRidesController.getAllRides(pagenumber, query);
   },
-  getAllRidesCount: async () => {
-    return await dbRidesController.getAllRidesCount();
+  getAllRidesCount: async ({ query }: { query?: string }) => {
+    return await dbRidesController.getAllRidesCount(query);
   },
   getUser: async ({ username }: { username: string }) => {
     const res = await dbUserController.getUserByUsername(username);
@@ -109,7 +109,13 @@ app.listen(5001, async () => {
   console.log(servInfo);
   console.log("server started at port 5001");
 
-  await dbGeneralController.initDb();
+  const usersCount = await dbUserController.getAllUsersCount();
+  const isDbEmpty = usersCount === 0;
+
+  if (isDbEmpty) {
+    console.info("INITIALIZING BD");
+    await dbGeneralController.initDb();
+  }
 });
 
 app.get("/download", async (req, res) => {

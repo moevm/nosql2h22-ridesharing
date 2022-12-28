@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
-    "@gravity-ui/uikit": "^3.11.0"
+    "@gravity-ui/uikit": "^3.11.0",
+    "@types/lodash": "^4.14.191"
   }
 }

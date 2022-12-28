@@ -14,6 +14,10 @@ body {
   margin: 0;
 }
 
+.layout {
+  height: 100%;
+}
+
 .aside-header-showcase {
   &__content {
     @include text-body-3;

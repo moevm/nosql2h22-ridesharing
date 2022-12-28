@@ -6,8 +6,6 @@ import { useState } from "react";
 export const RideStatusHistory = (props: { ride: TRide, open?: boolean }) => {
   const [visible, setVisible] = useState(props.open ?? false);
 
-  console.log(visible);
-
   return (
     <>
       <div>

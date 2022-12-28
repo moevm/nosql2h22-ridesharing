@@ -51,6 +51,13 @@ export const AddRideDialog: React.FC = () => {
       },
     }).then(({ data }) => {
       if (data.createRide) {
+        add({
+          name: "Ride created",
+          title: "Ride created",
+          type: "success",
+          allowAutoHiding: true,
+          timeout: 5000,
+        });
         setOpen(false);
         setRideForm(initialFormState);
       }

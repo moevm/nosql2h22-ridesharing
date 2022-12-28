@@ -19,15 +19,30 @@ export class DbUserController {
     }
   }
 
-  public async getAllUsers(pagenumber: number): Promise<TUser[]> {
+  public async getAllUsers(pagenumber: number, query?: string): Promise<TUser[]> {
     const _session = driver.session();
     try {
-      const respRead = await _session.readTransaction((tcx) =>
-        tcx.run("MATCH (u:USER) RETURN u ORDER by u.id SKIP $pagination LIMIT $pageSize", {
-          pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
-          pageSize: neo4j.int(MAX_PAGE_SIZE),
-        })
-      );
+      let respRead;
+      if (query) {
+        respRead = await _session.readTransaction((tcx) =>
+          tcx.run(
+            "MATCH (u:USER) where apoc.text.sorensenDiceSimilarity(u.username, $username) >= 0.3" +
+              " RETURN u ORDER by u.id SKIP $pagination LIMIT $pageSize",
+            {
+              pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
+              pageSize: neo4j.int(MAX_PAGE_SIZE),
+              username: query,
+            }
+          )
+        );
+      } else {
+        respRead = await _session.readTransaction((tcx) =>
+          tcx.run("MATCH (u:USER) RETURN u ORDER by u.id SKIP $pagination LIMIT $pageSize", {
+            pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
+            pageSize: neo4j.int(MAX_PAGE_SIZE),
+          })
+        );
+      }
       const res = respRead.records.map((record) => record["_fields"][0].properties);
       _session.close();
 
@@ -40,13 +55,26 @@ export class DbUserController {
     }
   }
 
-  public async getAllUsersCount(): Promise<number> {
+  public async getAllUsersCount(query?: string): Promise<number> {
+    const _session = driver.session();
+
     try {
-      const respRead = await this.session.readTransaction((tcx) => tcx.run("MATCH (u: USER) RETURN count(u)"));
+      let neo4jquery = "";
+      let respRead;
+      if (query) {
+        neo4jquery =
+          "MATCH (u:USER) where apoc.text.sorensenDiceSimilarity(u.username, $username) >= 0.3 RETURN count(u)";
+        respRead = await _session.readTransaction((tcx) => tcx.run(neo4jquery, { username: query }));
+      } else {
+        neo4jquery = "MATCH (u: USER) RETURN count(u)";
+        respRead = await _session.readTransaction((tcx) => tcx.run(neo4jquery));
+      }
       const res = respRead.records.map((record) => record["_fields"][0]);
+      _session.close();
       return res[0];
     } catch (error) {
       console.error(error);
+      _session.close();
       return 0;
     }
   }

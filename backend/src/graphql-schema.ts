@@ -88,10 +88,10 @@ export const schema = buildSchema(`
   }
   
   type Query {
-    getAllUsers(pagenumber: Int): [User]
-    getAllUsersCount: Int
-    getAllRides(pagenumber: Int): [Ride]
-    getAllRidesCount: Int
+    getAllUsers(pagenumber: Int, query: String): [User]
+    getAllUsersCount(query: String): Int
+    getAllRides(pagenumber: Int, query: String): [Ride]
+    getAllRidesCount(query: String): Int
     getUserRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUserPassedRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUserInvitations(username: String, pagenumber: Int) : [UserRidesReadResponse]

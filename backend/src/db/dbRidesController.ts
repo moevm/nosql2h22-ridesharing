@@ -14,17 +14,32 @@ import { driver } from "../index";
 export class DbRidesController {
   private session = driver.session();
 
-  public async getAllRides(pagenumber: number): Promise<TRide[]> {
+  public async getAllRides(pagenumber: number, query?: string): Promise<TRide[]> {
     const _session = driver.session();
     try {
-      const respRead = await _session.readTransaction((txc) =>
-        txc.run("MATCH (r:RIDE) RETURN r ORDER by r.id SKIP $pagination LIMIT $pageSize", {
-          pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
-          pageSize: neo4j.int(MAX_PAGE_SIZE),
-        })
-      );
-      const res = respRead.records.map((record) => record["_fields"][0].properties);
+      let respRead;
+      if (query) {
+        respRead = await _session.readTransaction((txc) =>
+          txc.run(
+            "MATCH (r:RIDE) where apoc.text.sorensenDiceSimilarity(r.title, $title) >= 0.3" +
+              " RETURN r ORDER by r.id SKIP $pagination LIMIT $pageSize",
+            {
+              pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
+              pageSize: neo4j.int(MAX_PAGE_SIZE),
+              title: query,
+            }
+          )
+        );
+      } else {
+        respRead = await _session.readTransaction((txc) =>
+          txc.run("MATCH (r:RIDE) RETURN r ORDER by r.id SKIP $pagination LIMIT $pageSize", {
+            pagination: neo4j.int((pagenumber - 1) * MAX_PAGE_SIZE),
+            pageSize: neo4j.int(MAX_PAGE_SIZE),
+          })
+        );
+      }
 
+      const res = respRead.records.map((record) => record["_fields"][0].properties);
       _session.close();
 
       return res as TRide[];
@@ -79,13 +94,27 @@ export class DbRidesController {
     }
   }
 
-  public async getAllRidesCount(): Promise<number> {
+  public async getAllRidesCount(query?: string): Promise<number> {
+    const _session = driver.session();
+
+    let respRead;
+    if (query) {
+      respRead = await _session.readTransaction((tcx) =>
+        tcx.run("MATCH (r: RIDE) where apoc.text.sorensenDiceSimilarity(r.title, $title) >= 0.3 RETURN count(r)", {
+          title: query,
+        })
+      );
+    } else {
+      respRead = await _session.readTransaction((tcx) => tcx.run("MATCH (r: RIDE) RETURN count(r)"));
+    }
+
     try {
-      const respRead = await this.session.readTransaction((tcx) => tcx.run("MATCH (r: RIDE) RETURN count(r)"));
       const res = respRead.records.map((record) => record["_fields"][0]);
+      _session.close();
       return res[0];
     } catch (error) {
       console.error(error);
+      _session.close();
       return 0;
     }
   }
@@ -204,13 +233,15 @@ export class DbRidesController {
 
     try {
       const response = await this.session.run(
-        "match (u: USER {username: $username}) -[edge:RELATES {isFuture:$isFuture}] - (r: RIDE) return  r, edge " +
+        "match (u: USER {username: $username}) -[edge:RELATES " +
+          "{isFuture:$isFuture, isSure:$isSure}] - (r: RIDE) return  r, edge " +
           "ORDER BY r.id SKIP toInteger($pagination) LIMIT toInteger($pageSize)",
         {
           username,
           pagination: pagination === 0 ? 0 : neo4j.int((pagination - 1) * MAX_PAGE_SIZE),
           pageSize: pagination === 0 ? 1000 : neo4j.int(MAX_PAGE_SIZE),
           isFuture: true,
+          isSure: true,
         }
       );
 

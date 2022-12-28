@@ -18,6 +18,8 @@ import {
 import { TableActionConfig, useToaster } from "@gravity-ui/uikit";
 import { ProfilePageContext } from "../../pages/profilePage";
 
+import "./style.scss"
+
 export const RidesTable = (props: {
   graphQlMethod: DocumentNode;
   extractMethod: string;
@@ -190,7 +192,7 @@ export const RidesTable = (props: {
   return (
     <>
       <TableWithAction
-        className={"ridesharing-table"}
+        className={"ride-table"}
         onRowClick={(event) => {
           console.log(event);
           navigate(`/ride/${event.id}`);
@@ -229,6 +231,7 @@ export const RidesTable = (props: {
         getRowActions={(item) => setupTableActions(item)}
       />
       <Pagination
+        className={"ride-table-pagination"}
         count={pageCount}
         page={pageNumber}
         color="primary"
