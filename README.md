@@ -1,12 +1,13 @@
 # nosql2h22-ridesharing
 
-admin account - 
+### admin account - 
 
 login - admin 
 
 password - admin
 
-test account - 
+### test account - 
+
 login - test
 password - test
 
@@ -15,4 +16,6 @@ npm start
 
 in both backend/frontend
 
-or docker-compose up --build
+or ```docker-compose up --build```
+
+frontend - localhost:3000
