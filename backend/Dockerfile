@@ -1,8 +1,14 @@
 FROM node:alpine
+
 WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
-COPY ./ ./
-RUN npm i
+
+COPY package-lock.json  package.json ./
+
+COPY . .
+
+RUN npm ci
+
 CMD ["npm", "run", "start"]
+
 EXPOSE 5001
+

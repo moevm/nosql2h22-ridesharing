@@ -1,0 +1,2 @@
+CREATE (u:USER {password:"admin",isAuthorized:true,id:"850e1fec-176d-40c8-b00e-14da27fa54b2",isAdmin:true,  username:"admin"});
+CREATE (u:USER {password:"test",isAuthorized:true,id:"8714404c-5f3b-49a3-94f2-c41940b3e892",isAdmin:false,  username:"test"});

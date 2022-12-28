@@ -15,10 +15,11 @@ dotenv.config();
 console.log(process.env.NEO4J_URI);
 console.log(process.env.NEO4J_USER);
 console.log(process.env.NEO4J_PASSWORD);
+console.log(process.env.NEO4J_AUTH);
 
 export const driver = neo4j.driver(
-  process.env.NEO4J_URI || "bolt://localhost:7687",
-  neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "neo4j"),
+  process.env.NEO4J_URI || "bolt://neo4j:7687",
+  neo4j.auth.basic(process.env.NEO4J_USER || "neo4j", process.env.NEO4J_PASSWORD || "123456789"),
   { disableLosslessIntegers: true }
 );
 
@@ -107,6 +108,8 @@ app.listen(5001, async () => {
   const servInfo = await driver.getServerInfo();
   console.log(servInfo);
   console.log("server started at port 5001");
+
+  await dbGeneralController.initDb();
 });
 
 app.get("/download", async (req, res) => {
