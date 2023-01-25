@@ -72,6 +72,12 @@ const root = {
   getUserPassedRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserPassedRides(username, pagenumber);
   },
+  /*getUserProposedRidesCount: async ({ username }: { username: string }) => {
+    return await dbRidesController.getUserProposedRidesCount(username);
+  },*/
+  getUserProposedRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
+    return await dbRidesController.getUserProposedRides(username, pagenumber);
+  },
   getUserInvitations: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserInvitations(username, pagenumber);
   },

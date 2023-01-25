@@ -51,6 +51,11 @@ export type TRideReadResponse = {
   relation: TRelation;
 };
 
+export type TRidesReadResponse = {
+  ride: TRide;
+  count: number;
+};
+
 export type TUserRidesReadResponse = TRideReadResponse & {
   count: number;
 };

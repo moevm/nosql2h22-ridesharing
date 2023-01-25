@@ -7,6 +7,7 @@ import {
   TRideReadResponse,
   TUser,
   TUserRidesReadResponse,
+  TRidesReadResponse,
 } from "../definitions";
 import neo4j from "neo4j-driver";
 import { driver } from "../index";
@@ -347,4 +348,66 @@ export class DbRidesController {
       return false;
     }
   }
+
+  /*public async getUserProposedRidesCount(username: string): Promise<number> {
+    const _session = driver.session();
+    try {
+      const response = await _session.run(
+          "match (u: USER {username: $username}) -[edge:RELATES {isDriver: $isDriver, isFuture: $isFuture, " +
+          "isSure: $isSure}] - (r: RIDE) return  count(r), edge ",
+          {
+            isDriver: false,
+            isFuture: false,
+            isSure: false,
+            username,
+          }
+      );
+
+      const res = response.records.map((record) => record["_fields"][0]);
+
+      _session.close();
+      return res[0];
+    } catch (error) {
+      console.error(error);
+      _session.close();
+      return 0;
+    }
+  }*/
+
+
+
+  public async getUserProposedRides(username: string, pagination: number): Promise<TRidesReadResponse[]> {
+    const _session = driver.session();
+    try {
+      const response = await _session.run(
+          "match (u: USER {username: $username}), (r: RIDE) WHERE NOT (u)-[]-(r) return  r " +
+          "ORDER BY r.id SKIP $pagination LIMIT $pageSize",
+          {
+            username,
+            pagination: neo4j.int((pagination - 1) * MAX_PAGE_SIZE),
+            pageSize: neo4j.int(MAX_PAGE_SIZE),
+          }
+      );
+
+      //const res = response.records.map((record) => (record["_fields"][0].properties));
+      const res = response.records.map((record) => ({
+        ride: record["_fields"][0].properties as TRide,
+        count: response.records.length,
+      }));
+      /*const res = response.records.map((record) => ({
+        ride: record["_fields"][0].properties as TRide,
+        relation: record["_fields"][1].properties as TRelation,
+        count: response.records.length,
+      }));*/
+
+      _session.close();
+      return res;
+    } catch (error) {
+      console.error(error);
+      _session.close();
+      return [];
+    }
+  }
 }
+
+

@@ -101,6 +101,30 @@ export const GET_USER_PASSED_RIDES = gql`
   }
 `;
 
+/*export const GET_USER_PROPOSED_RIDES_COUNT = gql`
+  query getUserProposedRidesCount($username: String) {
+    getUserProposedRidesCount($username: String)
+  }
+`;*/
+
+export const GET_USER_PROPOSED_RIDES = gql`
+  query getUserProposedRides($username: String, $pagenumber: Int) {
+    getUserProposedRides(username: $username, pagenumber: $pagenumber) {
+      ride {
+        id
+        title
+        date
+        from
+        to
+        price
+        maxPassengers
+        statusHistory
+      }
+      count
+    }
+  }
+`;
+
 export const GET_USER_INVITED_RIDES = gql`
   query getUserInvitations($username: String, $pagenumber: Int) {
     getUserInvitations(username: $username, pagenumber: $pagenumber) {

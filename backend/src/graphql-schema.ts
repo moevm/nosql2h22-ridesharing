@@ -41,6 +41,11 @@ export const schema = buildSchema(`
    relation: Relation
   }
   
+  type RidesReadResponse {
+   ride: Ride
+   count: Int
+  }
+  
   type UserRidesReadResponse {
    ride: Ride
    relation: Relation
@@ -94,6 +99,8 @@ export const schema = buildSchema(`
     getAllRidesCount(query: String): Int
     getUserRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUserPassedRides(username: String, pagenumber: Int) : [UserRidesReadResponse]
+    getUserProposedRides(username: String, pagenumber: Int) : [RidesReadResponse]
+    
     getUserInvitations(username: String, pagenumber: Int) : [UserRidesReadResponse]
     getUser(username: String): UserReadResponse
     getRide(id: ID, username: String): RideReadResponse
@@ -112,3 +119,5 @@ export const schema = buildSchema(`
   }
   
 `);
+
+//getUserProposedRidesCount(username: String) : Int
