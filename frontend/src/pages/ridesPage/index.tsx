@@ -31,20 +31,6 @@ export const RidesPage = () => {
       }
   }, []);
 
-  const setupTableActions = (item: TUser): TableActionConfig<TUser>[] => {
-      // if (!props.withActions) return [];
-      if (item.username) {
-          return [
-              // {
-              //   text: "Invite in ride",
-              //   handler: function handler() {
-              //     // deleteRideCb(item.id);
-              //   },
-              // },
-          ];
-      } else return [];
-  };
-
   return (
       <ProfilePageContext.Provider value={{ shouldUpdate, setShouldUpdate }}>
           <div className={"rides-page"}>

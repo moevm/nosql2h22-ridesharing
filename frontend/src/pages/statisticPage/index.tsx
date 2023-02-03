@@ -22,23 +22,6 @@ export const StatisticPage = () => {
     }
   }, []);
 
-  const downloadDb = () => {
-    fetch(`http://localhost:5001/download`, {
-      method: "GET",
-    })
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `db.json`);
-
-        document.body.appendChild(link);
-
-        link.click();
-        link.parentNode!.removeChild(link);
-      });
-  };
 
   return (
     <div className={"stats-page"}>
@@ -116,16 +99,6 @@ export const StatisticPage = () => {
         ></AllEntitiesTable>
       </Card>
 
-      <Button
-        className={"download-button"}
-        view="action"
-        size={"s"}
-        onClick={function onClick() {
-          downloadDb();
-        }}
-      >
-        Download DB
-      </Button>
     </div>
   );
 };

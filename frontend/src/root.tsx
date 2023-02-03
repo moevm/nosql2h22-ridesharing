@@ -10,6 +10,7 @@ import { TUser } from "./definitions";
 import { RidesPage } from "./pages/ridesPage";
 import { RidePage } from "./pages/ridePage";
 import { CompanionsPage } from "./pages/companionsPage";
+import { ExportImportPage } from "./pages/exportImportPage";
 
 export const UserContext = React.createContext({
   currentUser: {
@@ -45,6 +46,7 @@ function Root() {
             <Route path="rides" element={<RidesPage />}></Route>
             <Route path="companions" element={<CompanionsPage />}></Route>
             <Route path="ride/:id" element={<RidePage />}></Route>
+            <Route path="export_import" element={<ExportImportPage />}></Route>
           </Route>
         </Routes>
       </UserContext.Provider>

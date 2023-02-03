@@ -42,6 +42,14 @@ export function AsideHeaderShowcase() {
         navigate("/companions");
       },
     },
+    {
+      id: "export_import",
+      title: "Export/Import",
+      iconSize: 20,
+      onItemClick: () => {
+        navigate("/export_import");
+      },
+    },
   ];
 
   const adminItems = [
