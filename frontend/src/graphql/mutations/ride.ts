@@ -29,3 +29,9 @@ export const ACCEPT_INVITE = gql`
         acceptInvitation(input: $input)
     }
 `;
+
+export const ADD_PROPOSED_RIDE = gql`
+    mutation addProposedRide($input: RideAddProposedInput) {
+        addProposedRide(input: $input)
+    }
+`;

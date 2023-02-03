@@ -14,6 +14,7 @@ import {
   ACCEPT_INVITE,
   DELETE_RIDE,
   RESOLVE_RIDE,
+  ADD_PROPOSED_RIDE,
 } from "../../graphql/mutations/ride";
 import { TableActionConfig, useToaster } from "@gravity-ui/uikit";
 import { ProfilePageContext } from "../../pages/profilePage";
@@ -25,6 +26,7 @@ export const RidesTable = (props: {
   extractMethod: string;
   currentUser: TUser;
   withActions: boolean;
+  addProposedRideAction?: boolean;
 }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(MAX_PAGE_SIZE);
@@ -45,6 +47,7 @@ export const RidesTable = (props: {
   const [deleteRide] = useMutation(DELETE_RIDE);
   const [resolveRide] = useMutation(RESOLVE_RIDE);
   const [acceptInvite] = useMutation(ACCEPT_INVITE);
+  const [addProposedRide] = useMutation(ADD_PROPOSED_RIDE);
 
   const acceptInviteCb = (rideId: string) => {
     acceptInvite({
@@ -133,10 +136,48 @@ export const RidesTable = (props: {
     });
   };
 
+
+  const addProposedRideCb = (rideId: string) => {
+    console.log("----------test1-------------")
+    addProposedRide({
+      variables: {
+        input: {
+          rideId,
+          userId: props.currentUser.id,
+        },
+      },
+    }).then((response) => {
+      refetch({
+        pagenumber: pageNumber,
+        username: props.currentUser.username,
+      });
+
+      setShouldUpdate(true);
+
+      add({
+        name: "Done",
+        title: "Ride added",
+        type: "success",
+        allowAutoHiding: true,
+        timeout: 5000,
+      });
+    }).catch((err) => alert(err));
+  };
+
   const setupTableActions = (
     item: TRideWithRelation
   ): TableActionConfig<TRideWithRelation>[] => {
     if (!props.withActions) return [];
+    if (props.addProposedRideAction) {
+      return [
+        {
+          text: "Add",
+          handler: function handler() {
+            addProposedRideCb(item.id);
+          },
+        },
+      ];
+    }
     if (item.isDriver) {
       return [
         {

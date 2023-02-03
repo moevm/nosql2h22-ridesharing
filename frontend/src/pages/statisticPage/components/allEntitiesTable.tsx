@@ -23,7 +23,7 @@ export const AllEntitiesTable = (props: {
   const [pageCount, setPageCount] = useState(MAX_PAGE_SIZE);
 
   const [getData, { data, loading, error, refetch }] = useLazyQuery(
-    props.graphQlMethod
+      props.graphQlMethod
   );
 
   const {
@@ -60,7 +60,7 @@ export const AllEntitiesTable = (props: {
   useEffect(() => {
     if (!countLoading && countData) {
       setPageCount(
-        Math.floor(countData[props.extractCountMethod] / MAX_PAGE_SIZE) + 1
+          Math.floor(countData[props.extractCountMethod] / MAX_PAGE_SIZE) + 1
       );
     }
   }, [countData]);
@@ -78,25 +78,25 @@ export const AllEntitiesTable = (props: {
   }, []);
 
   return (
-    <>
-      <TableWithAction
-        className={"all-entities-table"}
-        columns={props.columns}
-        data={tableData}
-        emptyMessage="No data at all ¯\_(ツ)_/¯"
-        getRowActions={(item) =>
-          props.setupTableActions ? props.setupTableActions(item) : []
-        }
-      />
-      <Pagination
-        className={"all-entities-table-pagination"}
-        count={pageCount}
-        page={pageNumber}
-        color="primary"
-        onChange={(event, page) => {
-          setPageNumber(page);
-        }}
-      />
-    </>
+      <>
+        <TableWithAction
+            className={"all-entities-table"}
+            columns={props.columns}
+            data={tableData}
+            emptyMessage="No data at all ¯\_(ツ)_/¯"
+            getRowActions={(item) =>
+                props.setupTableActions ? props.setupTableActions(item) : []
+            }
+        />
+        <Pagination
+            className={"all-entities-table-pagination"}
+            count={pageCount}
+            page={pageNumber}
+            color="primary"
+            onChange={(event, page) => {
+              setPageNumber(page);
+            }}
+        />
+      </>
   );
 };

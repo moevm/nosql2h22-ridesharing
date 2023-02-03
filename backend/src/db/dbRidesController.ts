@@ -349,33 +349,6 @@ export class DbRidesController {
     }
   }
 
-  /*public async getUserProposedRidesCount(username: string): Promise<number> {
-    const _session = driver.session();
-    try {
-      const response = await _session.run(
-          "match (u: USER {username: $username}) -[edge:RELATES {isDriver: $isDriver, isFuture: $isFuture, " +
-          "isSure: $isSure}] - (r: RIDE) return  count(r), edge ",
-          {
-            isDriver: false,
-            isFuture: false,
-            isSure: false,
-            username,
-          }
-      );
-
-      const res = response.records.map((record) => record["_fields"][0]);
-
-      _session.close();
-      return res[0];
-    } catch (error) {
-      console.error(error);
-      _session.close();
-      return 0;
-    }
-  }*/
-
-
-
   public async getUserProposedRides(username: string, pagination: number): Promise<TRidesReadResponse[]> {
     const _session = driver.session();
     try {
@@ -394,11 +367,6 @@ export class DbRidesController {
         ride: record["_fields"][0].properties as TRide,
         count: response.records.length,
       }));
-      /*const res = response.records.map((record) => ({
-        ride: record["_fields"][0].properties as TRide,
-        relation: record["_fields"][1].properties as TRelation,
-        count: response.records.length,
-      }));*/
 
       _session.close();
       return res;
@@ -408,6 +376,29 @@ export class DbRidesController {
       return [];
     }
   }
+
+  public async addProposedRide(rideId: string, userId: string): Promise<boolean> {
+    try {
+      const response = await this.session.run(
+          "match (u: USER {id: $userId})  " +
+          "match (r: RIDE {id: $rideId})" +
+          "set r.statusHistory=$added + r.statusHistory " +
+          "create (u)-[:RELATES {isDriver: false, isFuture: true, isSure: true}]->(r)  return u",
+          {
+            userId,
+            rideId,
+            added: [`ADDED_BY_${userId}:${Date.now()}`],
+          }
+      );
+
+      return true;
+    } catch (error) {
+      console.log(error);
+
+      return false;
+    }
+  }
+
 }
 
 

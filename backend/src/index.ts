@@ -72,9 +72,6 @@ const root = {
   getUserPassedRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserPassedRides(username, pagenumber);
   },
-  /*getUserProposedRidesCount: async ({ username }: { username: string }) => {
-    return await dbRidesController.getUserProposedRidesCount(username);
-  },*/
   getUserProposedRides: async ({ username, pagenumber }: { username: string; pagenumber: number }) => {
     return await dbRidesController.getUserProposedRides(username, pagenumber);
   },
@@ -86,6 +83,10 @@ const root = {
   },
   acceptInvitation: async ({ input }: { input: TRideInvitationInput }) => {
     return await dbRidesController.acceptInvitation(input.rideId, input.userId);
+  },
+  addProposedRide: async ({ input }: { input: TRideInvitationInput }) => {
+    console.log("----------test-------------")
+    return await dbRidesController.addProposedRide(input.rideId, input.userId);
   },
   createUser: async ({ input }: { input: TCreateUser }) => {
     const readUser = await dbUserController.getUserByUsername(input.username);

@@ -92,6 +92,11 @@ export const schema = buildSchema(`
     userId: ID
   }
   
+  input RideAddProposedInput {
+    rideId: ID
+    userId: ID
+  }
+  
   type Query {
     getAllUsers(pagenumber: Int, query: String): [User]
     getAllUsersCount(query: String): Int
@@ -116,8 +121,7 @@ export const schema = buildSchema(`
     markRideAsResolved(input: markRideAsResolvedInput): Boolean 
     sendRideInvitation(input: RideInvitationInput): Boolean 
     acceptInvitation(input: RideAcceptInvitationInput): Boolean 
+    addProposedRide(input: RideAddProposedInput): Boolean 
   }
   
 `);
-
-//getUserProposedRidesCount(username: String) : Int
